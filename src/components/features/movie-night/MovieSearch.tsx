@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { nominateMovie } from "@/lib/actions/voting";
 
@@ -21,11 +21,25 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
+    const [trending, setTrending] = useState<SearchResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isLoadingTrending, setIsLoadingTrending] = useState(false);
     const [isNominating, setIsNominating] = useState<number | null>(null);
     const [pitch, setPitch] = useState("");
     const [selectedMovie, setSelectedMovie] = useState<SearchResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Fetch trending when modal opens
+    useEffect(() => {
+        if (isOpen && trending.length === 0) {
+            setIsLoadingTrending(true);
+            fetch("/api/movies/trending")
+                .then((res) => res.json())
+                .then((data) => setTrending(data.results || []))
+                .catch(() => setTrending([]))
+                .finally(() => setIsLoadingTrending(false));
+        }
+    }, [isOpen, trending.length]);
 
     const search = useCallback(async (searchQuery: string) => {
         if (searchQuery.length < 2) {
@@ -194,13 +208,11 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                         <div className="p-8 text-center text-gray-400">
                                             Searching...
                                         </div>
-                                    ) : results.length === 0 ? (
+                                    ) : query.length >= 2 && results.length === 0 ? (
                                         <div className="p-8 text-center text-gray-400">
-                                            {query.length >= 2
-                                                ? "No results found"
-                                                : "Type to search movies and shows"}
+                                            No results found
                                         </div>
-                                    ) : (
+                                    ) : query.length >= 2 ? (
                                         <div className="space-y-2">
                                             {results.map((result) => (
                                                 <button
@@ -226,6 +238,42 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                                     </div>
                                                 </button>
                                             ))}
+                                        </div>
+                                    ) : (
+                                        /* Trending view when query is empty */
+                                        <div className="p-2">
+                                            <h3 className="text-sm font-semibold text-[#E50914] mb-3 flex items-center gap-2">
+                                                🔥 Trending Now
+                                            </h3>
+                                            {isLoadingTrending ? (
+                                                <div className="text-center text-gray-400 py-4">
+                                                    Loading trending...
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {trending.slice(0, 9).map((item) => (
+                                                        <button
+                                                            key={item.id}
+                                                            onClick={() => setSelectedMovie(item)}
+                                                            className="group relative aspect-[2/3] rounded-lg overflow-hidden hover:ring-2 hover:ring-[#E50914] transition-all"
+                                                        >
+                                                            <Image
+                                                                src={item.posterUrl}
+                                                                alt={item.title}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <div className="absolute bottom-0 left-0 right-0 p-2">
+                                                                    <p className="text-white text-xs font-medium line-clamp-2">
+                                                                        {item.title}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>

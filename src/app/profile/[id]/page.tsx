@@ -100,12 +100,19 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                         {profile.name || "Anonymous"}
                                         {isOwnProfile && <span className="text-gray-500 text-lg ml-2">(You)</span>}
                                     </h1>
-                                    {!isOwnProfile && (
+                                    {!isOwnProfile ? (
                                         <FollowButton
                                             targetUserId={profile.id}
                                             isFollowing={followStatus.isFollowing}
                                             isMutual={followStatus.isMutual}
                                         />
+                                    ) : (
+                                        <Link
+                                            href="/profile/edit"
+                                            className="px-4 py-2 text-sm font-medium rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/5"
+                                        >
+                                            Edit Profile
+                                        </Link>
                                     )}
                                 </div>
 

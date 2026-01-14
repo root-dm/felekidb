@@ -111,6 +111,24 @@ export async function submitRating(input: SubmitRatingInput) {
         });
     }
 
+    // Notify nominator about the rating (if rater is different from nominator)
+    if (session.user.id !== nominatorId) {
+        const rater = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { name: true },
+        });
+
+        await prisma.notification.create({
+            data: {
+                userId: nominatorId,
+                type: "RATING",
+                title: "New Rating",
+                message: `${rater?.name || "Someone"} rated your pick ${validated.score}⭐`,
+                link: `/nights/${validated.movieNightId}`,
+            },
+        });
+    }
+
     revalidatePath(`/nights/${validated.movieNightId}`);
     revalidatePath("/dashboard");
 }

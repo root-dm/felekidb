@@ -7,6 +7,8 @@ import { getActivityFeed, getQuickStats } from "@/lib/actions/feed";
 import { formatDate, getTimeRemaining } from "@/lib/utils";
 import { getPosterUrl } from "@/lib/tmdb";
 import { ActivityFeed } from "@/components/features/feed/ActivityFeed";
+import { FindFriends } from "@/components/features/social/FindFriends";
+import { getSuggestedUsers } from "@/lib/actions/search";
 
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -17,10 +19,11 @@ export default async function DashboardPage() {
         redirect("/login");
     }
 
-    const [{ upcoming, past }, feedItems, stats] = await Promise.all([
+    const [{ upcoming, past }, feedItems, stats, suggestedUsers] = await Promise.all([
         getUserMovieNights(),
         getActivityFeed(15),
         getQuickStats(),
+        getSuggestedUsers(session.user.id, 5),
     ]);
 
     return (
@@ -172,13 +175,19 @@ export default async function DashboardPage() {
                         )}
                     </div>
 
-                    {/* Right Column - Activity Feed */}
+                    {/* Right Column - Sidebar */}
                     <div className="lg:col-span-1">
-                        <div className="sticky top-24">
-                            <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                                📡 Activity Feed
-                            </h2>
-                            <ActivityFeed items={feedItems} />
+                        <div className="sticky top-24 space-y-6">
+                            {/* Find Friends */}
+                            <FindFriends suggestedUsers={suggestedUsers} />
+
+                            {/* Activity Feed */}
+                            <div>
+                                <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+                                    📡 Activity Feed
+                                </h2>
+                                <ActivityFeed items={feedItems} />
+                            </div>
                         </div>
                     </div>
                 </div>

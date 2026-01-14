@@ -12,6 +12,7 @@ import { RatingSection } from "@/components/features/movie-night/RatingSection";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { EditableLocation } from "@/components/features/movie-night/EditableLocation";
 import { AutoStartManager } from "@/components/features/movie-night/AutoStartManager";
+import { CommentSection } from "@/components/features/movie-night/CommentSection";
 
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -59,6 +60,15 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                         select: { id: true, name: true, image: true },
                     },
                 },
+            },
+            comments: {
+                include: {
+                    user: {
+                        select: { id: true, name: true, image: true },
+                    },
+                },
+                orderBy: { createdAt: "desc" },
+                take: 50,
             },
         },
     });
@@ -277,6 +287,14 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                     />
                                 </section>
                             )}
+
+                        {/* Discussion / Comments */}
+                        <section className="animate-fade-in-up animate-delay-300">
+                            <CommentSection
+                                movieNightId={movieNight.id}
+                                initialComments={movieNight.comments}
+                            />
+                        </section>
                     </div>
 
                     {/* Right Column - Sidebar */}

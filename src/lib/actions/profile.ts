@@ -133,3 +133,70 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     };
 }
 
+import { auth } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+
+/**
+ * Update user profile
+ */
+export async function updateProfile(data: { name: string }) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!data.name || data.name.length < 2) {
+        throw new Error("Name must be at least 2 characters");
+    }
+
+    await prisma.user.update({
+        where: { id: session.user.id },
+        data: { name: data.name },
+    });
+
+    revalidatePath(`/profile/${session.user.id}`);
+    revalidatePath("/dashboard");
+    return { success: true };
+}
+
+/**
+ * Delete user account and all associated data
+ */
+export async function deleteAccount() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const userId = session.user.id;
+
+    // Delete in order to respect foreign key constraints
+    await prisma.$transaction([
+        // Delete notifications
+        prisma.notification.deleteMany({ where: { userId } }),
+        // Delete comments
+        prisma.movieNightComment.deleteMany({ where: { userId } }),
+        // Delete votes
+        prisma.vote.deleteMany({ where: { userId } }),
+        // Delete ratings
+        prisma.rating.deleteMany({ where: { userId } }),
+        // Delete reputation events
+        prisma.reputationEvent.deleteMany({ where: { userId } }),
+        // Delete nominations
+        prisma.nomination.deleteMany({ where: { userId } }),
+        // Delete invitations
+        prisma.invitation.deleteMany({ where: { userId } }),
+        // Delete follows (both directions)
+        prisma.follow.deleteMany({ where: { OR: [{ followerId: userId }, { followingId: userId }] } }),
+        // Delete hosted movie nights
+        prisma.movieNight.deleteMany({ where: { hostId: userId } }),
+        // Delete accounts (OAuth)
+        prisma.account.deleteMany({ where: { userId } }),
+        // Delete sessions
+        prisma.session.deleteMany({ where: { userId } }),
+        // Finally delete user
+        prisma.user.delete({ where: { id: userId } }),
+    ]);
+
+    return { success: true };
+}

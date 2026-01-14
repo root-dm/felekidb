@@ -74,6 +74,12 @@ model User {
   // Follow relations
   followers Follow[] @relation("Following") // People who follow this user
   following Follow[] @relation("Followers") // People this user follows
+
+  // Comments
+  comments MovieNightComment[]
+
+  // Notifications
+  notifications Notification[]
 }
 
 // ============================================================================
@@ -127,10 +133,47 @@ model MovieNight {
   nominations       Nomination[]      @relation("NightNominations")
   ratings           Rating[]
   reputationEvent   ReputationEvent?
+  comments          MovieNightComment[]
 
   @@index([hostId])
   @@index([status])
   @@index([scheduledAt])
+}
+
+// ============================================================================
+// MOVIE NIGHT COMMENTS
+// ============================================================================
+
+model MovieNightComment {
+  id           String     @id @default(cuid())
+  movieNightId String
+  movieNight   MovieNight @relation(fields: [movieNightId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content      String     @db.Text
+  createdAt    DateTime   @default(now())
+
+  @@index([movieNightId])
+  @@index([userId])
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "INVITE", "VOTE", "NEW_NOMINATION", "COMMENT"
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 enum InvitationStatus {

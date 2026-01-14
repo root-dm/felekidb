@@ -89,6 +89,28 @@ export async function nominateMovie(input: NominateMovieInput) {
         },
     });
 
+    // Notify other attendees about new nomination
+    const otherAttendees = movieNight.invitations
+        .filter((inv) => inv.userId !== session.user!.id && inv.status === "ACCEPTED")
+        .map((inv) => inv.userId);
+
+    const nominator = await prisma.user.findUnique({
+        where: { id: session.user!.id },
+        select: { name: true },
+    });
+
+    if (otherAttendees.length > 0) {
+        await prisma.notification.createMany({
+            data: otherAttendees.map((userId) => ({
+                userId,
+                type: "NEW_NOMINATION",
+                title: "New Nomination",
+                message: `${nominator?.name || "Someone"} nominated "${validated.title}"`,
+                link: `/nights/${validated.movieNightId}`,
+            })),
+        });
+    }
+
     revalidatePath(`/nights/${validated.movieNightId}`);
 }
 
@@ -176,6 +198,24 @@ export async function castVote(nominationId: string) {
         });
     }
 
+    // Notify nominator that their movie got a vote (if different from voter)
+    if (nomination.userId !== session.user.id) {
+        const voter = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { name: true },
+        });
+
+        await prisma.notification.create({
+            data: {
+                userId: nomination.userId,
+                type: "VOTE",
+                title: "New Vote",
+                message: `${voter?.name || "Someone"} voted for "${nomination.title}"`,
+                link: `/nights/${nomination.movieNightId}`,
+            },
+        });
+    }
+
     revalidatePath(`/nights/${nomination.movieNightId}`);
 }
 
@@ -196,6 +236,7 @@ export async function closeVoting(movieNightId: string) {
                     votes: true,
                 },
             },
+            invitations: true,
         },
     });
 
@@ -240,6 +281,26 @@ export async function closeVoting(movieNightId: string) {
             winningNominationId: winnerId,
         },
     });
+
+    // Notify all attendees about the winner
+    if (winnerId) {
+        const winner = movieNight.nominations.find((n) => n.id === winnerId);
+        const attendeeIds = movieNight.invitations
+            .filter((inv) => inv.status === "ACCEPTED")
+            .map((inv) => inv.userId);
+
+        if (attendeeIds.length > 0 && winner) {
+            await prisma.notification.createMany({
+                data: attendeeIds.map((userId) => ({
+                    userId,
+                    type: "WINNER",
+                    title: "Winner Announced! 🎬",
+                    message: `"${winner.title}" won for "${movieNight.title}"`,
+                    link: `/nights/${movieNightId}`,
+                })),
+            });
+        }
+    }
 
     revalidatePath(`/nights/${movieNightId}`);
 }

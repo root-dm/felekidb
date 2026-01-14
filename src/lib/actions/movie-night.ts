@@ -99,6 +99,22 @@ export const joinMovieNight = createSafeAction(joinMovieNightSchema, async ({ in
         },
     });
 
+    // Notify host that someone joined
+    const joiner = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+    });
+
+    await prisma.notification.create({
+        data: {
+            userId: movieNight.hostId,
+            type: "INVITE",
+            title: "New Attendee",
+            message: `${joiner?.name || "Someone"} joined "${movieNight.title}"`,
+            link: `/nights/${movieNight.id}`,
+        },
+    });
+
     revalidatePath(`/nights/${movieNight.id}`);
     return movieNight;
 });

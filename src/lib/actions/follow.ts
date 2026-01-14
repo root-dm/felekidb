@@ -47,6 +47,22 @@ export async function followUser(targetUserId: string) {
         },
     });
 
+    // Notify target user about new follower
+    const follower = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true },
+    });
+
+    await prisma.notification.create({
+        data: {
+            userId: targetUserId,
+            type: "FOLLOW",
+            title: "New Follower",
+            message: `${follower?.name || "Someone"} started following you`,
+            link: `/profile/${session.user.id}`,
+        },
+    });
+
     revalidatePath(`/profile/${targetUserId}`);
 }
 

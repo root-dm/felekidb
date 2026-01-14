@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { UserSearch } from "@/components/features/search/UserSearch";
+import { NotificationBell } from "@/components/features/notifications/NotificationBell";
 import { handleSignOut } from "@/lib/actions/auth";
 import { useState } from "react";
 interface NavbarProps {
@@ -50,6 +51,9 @@ export function Navbar({ user }: NavbarProps) {
 
                         {/* Profile & Mobile Toggle */}
                         <div className="flex items-center gap-3">
+                            {/* Notification Bell */}
+                            <NotificationBell />
+
                             <Link href={`/profile/${user.id}`} className="flex-shrink-0 relative">
                                 <div className="rounded-full p-0.5 bg-gradient-to-r from-[#E50914] to-[#b20710]">
                                     {user.image ? (
