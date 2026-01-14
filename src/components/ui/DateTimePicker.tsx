@@ -16,7 +16,7 @@ interface CustomDateTimePickerProps {
     label: string;
 }
 
-const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -25,12 +25,11 @@ const MONTHS = [
 export function DateTimePicker({ name, required, minDate, className, label }: CustomDateTimePickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [viewDate, setViewDate] = useState(new Date()); // For calendar navigation
-    const [selectedTime, setSelectedTime] = useState({ hours: 20, minutes: 0 }); // Default 8:00 PM
+    const [viewDate, setViewDate] = useState(new Date());
+    const [selectedTime, setSelectedTime] = useState({ hours: 20, minutes: 0 });
 
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Initialize from default or current
     useEffect(() => {
         if (!selectedDate) {
             const now = new Date();
@@ -40,7 +39,6 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
         }
     }, [minDate, selectedDate]);
 
-    // Handle outside click
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -51,7 +49,6 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Calendar logic
     const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
@@ -60,23 +57,74 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
     const daysInMonth = getDaysInMonth(currentYear, currentMonth);
     const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
 
-    const handleDateSelect = (day: number) => {
-        const newDate = new Date(currentYear, currentMonth, day);
-        newDate.setHours(selectedTime.hours);
-        newDate.setMinutes(selectedTime.minutes);
-        setSelectedDate(newDate);
-        // Don't close immediately, let them verify/change time if needed
+    // Check if we can navigate to previous month
+    const canGoBack = () => {
+        if (!minDate) return true;
+        // Can't go back if viewing the same month as minDate or earlier
+        const minYear = minDate.getFullYear();
+        const minMonth = minDate.getMonth();
+        if (currentYear < minYear) return false;
+        if (currentYear === minYear && currentMonth <= minMonth) return false;
+        return true;
     };
 
-    const handleTimeChange = (type: "hours" | "minutes", value: string) => {
-        const num = parseInt(value, 10);
-        const newTime = { ...selectedTime, [type]: num };
+    const handleDateSelect = (day: number) => {
+        const newDate = new Date(currentYear, currentMonth, day);
+        let hours = selectedTime.hours;
+        let minutes = selectedTime.minutes;
+
+        // If selecting today, ensure time is not in the past
+        if (minDate) {
+            newDate.setHours(hours);
+            newDate.setMinutes(minutes);
+            if (newDate < minDate) {
+                // Adjust to next hour from now
+                hours = minDate.getHours() + 1;
+                minutes = 0;
+                if (hours >= 24) hours = 23;
+            }
+        }
+
+        newDate.setHours(hours);
+        newDate.setMinutes(minutes);
+        setSelectedTime({ hours, minutes });
+        setSelectedDate(newDate);
+    };
+
+    const incrementTime = (type: "hours" | "minutes", delta: number) => {
+        let newHours = selectedTime.hours;
+        let newMinutes = selectedTime.minutes;
+
+        if (type === "hours") {
+            newHours = (selectedTime.hours + delta + 24) % 24;
+        } else {
+            newMinutes = selectedTime.minutes + delta;
+            if (newMinutes >= 60) {
+                newMinutes = 0;
+                newHours = (newHours + 1) % 24;
+            } else if (newMinutes < 0) {
+                newMinutes = 55;
+                newHours = (newHours - 1 + 24) % 24;
+            }
+        }
+
+        // Check if the new time would be in the past
+        if (minDate && selectedDate) {
+            const testDate = new Date(selectedDate);
+            testDate.setHours(newHours);
+            testDate.setMinutes(newMinutes);
+            if (testDate < minDate) {
+                return; // Don't allow setting time in the past
+            }
+        }
+
+        const newTime = { hours: newHours, minutes: newMinutes };
         setSelectedTime(newTime);
 
         if (selectedDate) {
             const newDate = new Date(selectedDate);
-            newDate.setHours(type === "hours" ? num : selectedTime.hours);
-            newDate.setMinutes(type === "minutes" ? num : selectedTime.minutes);
+            newDate.setHours(newHours);
+            newDate.setMinutes(newMinutes);
             setSelectedDate(newDate);
         }
     };
@@ -105,7 +153,6 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
             selectedDate.getFullYear() === currentYear;
     };
 
-    // Prepare hidden input value
     const hiddenValue = selectedDate ? selectedDate.toISOString() : "";
 
     return (
@@ -114,15 +161,15 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
 
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 {label}
-                {required && <span className="text-primary-400 ml-1">*</span>}
+                {required && <span className="text-[#E50914] ml-1">*</span>}
             </label>
 
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "w-full text-left px-4 py-3 rounded-xl bg-white/5 border text-white transition-all duration-300 flex items-center justify-between",
-                    isOpen ? "border-primary-500/50 bg-white/10" : "border-white/10 hover:bg-white/10",
+                    "w-full text-left px-4 py-3 rounded bg-[#333] border text-white transition-all duration-200 flex items-center justify-between",
+                    isOpen ? "border-white/30 bg-[#444]" : "border-white/10 hover:bg-[#3a3a3a]",
                     !selectedDate && "text-gray-400"
                 )}
             >
@@ -131,112 +178,158 @@ export function DateTimePicker({ name, required, minDate, className, label }: Cu
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 z-50 w-full md:w-[340px] bg-slate-900 border border-white/20 rounded-xl p-4 shadow-2xl animate-fade-in-up">
+                <div className="absolute top-full left-0 mt-2 z-50 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <button
-                            type="button"
-                            onClick={() => setViewDate(new Date(currentYear, currentMonth - 1, 1))}
-                            className="p-2 hover:bg-white/10 rounded-lg text-white hover:text-primary-400 transition-colors"
-                        >
-                            ←
-                        </button>
-                        <span className="font-bold text-white text-lg">
-                            {MONTHS[currentMonth]} {currentYear}
-                        </span>
-                        <button
-                            type="button"
-                            onClick={() => setViewDate(new Date(currentYear, currentMonth + 1, 1))}
-                            className="p-2 hover:bg-white/10 rounded-lg text-white hover:text-primary-400 transition-colors"
-                        >
-                            →
-                        </button>
+                    <div className="bg-[#141414] px-4 py-3 border-b border-white/10">
+                        <p className="text-white font-medium">Select Date and Time</p>
                     </div>
 
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1 text-center text-sm mb-4">
-                        {DAYS.map(day => (
-                            <div key={day} className="text-gray-400 py-2 font-bold text-xs uppercase tracking-wider">{day}</div>
-                        ))}
-                        {Array.from({ length: firstDay }).map((_, i) => (
-                            <div key={`empty-${i}`} />
-                        ))}
-                        {Array.from({ length: daysInMonth }).map((_, i) => {
-                            const day = i + 1;
-                            const disabled = isDateDisabled(day);
-                            const selected = isSelected(day);
+                    {/* Main Content - Side by Side Layout */}
+                    <div className="flex">
+                        {/* Left Side - Time Picker */}
+                        <div className="p-6 border-r border-white/10 flex flex-col items-center justify-center min-w-[140px]">
+                            {/* Display current selection */}
+                            <div className="text-gray-400 text-sm mb-4">
+                                {selectedDate
+                                    ? selectedDate.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' })
+                                    : "----/--/--"
+                                }
+                                {" "}
+                                {selectedTime.hours.toString().padStart(2, "0")}:{selectedTime.minutes.toString().padStart(2, "0")}
+                            </div>
 
-                            return (
+                            {/* Time Spinner */}
+                            <div className="flex items-center gap-1">
+                                {/* Hours */}
+                                <div className="flex flex-col items-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => incrementTime("hours", 1)}
+                                        className="text-gray-400 hover:text-white p-1 transition-colors"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                        </svg>
+                                    </button>
+                                    <div className="text-4xl font-light text-white my-2 tabular-nums">
+                                        {selectedTime.hours.toString().padStart(2, "0")}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => incrementTime("hours", -1)}
+                                        className="text-gray-400 hover:text-white p-1 transition-colors"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <span className="text-4xl font-light text-white mx-1">:</span>
+
+                                {/* Minutes */}
+                                <div className="flex flex-col items-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => incrementTime("minutes", 5)}
+                                        className="text-gray-400 hover:text-white p-1 transition-colors"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                        </svg>
+                                    </button>
+                                    <div className="text-4xl font-light text-white my-2 tabular-nums">
+                                        {selectedTime.minutes.toString().padStart(2, "0")}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => incrementTime("minutes", -5)}
+                                        className="text-gray-400 hover:text-white p-1 transition-colors"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Select Button */}
+                            <button
+                                type="button"
+                                onClick={() => setIsOpen(false)}
+                                className="mt-6 w-full bg-[#E50914] hover:bg-[#f40612] text-white font-semibold py-2 px-6 rounded transition-colors"
+                            >
+                                Select
+                            </button>
+                        </div>
+
+                        {/* Right Side - Calendar */}
+                        <div className="p-4">
+                            {/* Month Navigation */}
+                            <div className="flex items-center justify-between mb-4">
                                 <button
-                                    key={day}
                                     type="button"
-                                    disabled={disabled}
-                                    onClick={() => handleDateSelect(day)}
+                                    onClick={() => canGoBack() && setViewDate(new Date(currentYear, currentMonth - 1, 1))}
+                                    disabled={!canGoBack()}
                                     className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-all mx-auto font-medium",
-                                        selected
-                                            ? "bg-primary-600 text-white shadow-lg shadow-primary-500/50"
-                                            : disabled
-                                                ? "text-gray-700 cursor-not-allowed"
-                                                : "text-gray-200 hover:bg-white/20 hover:text-white"
+                                        "p-1 transition-colors",
+                                        canGoBack()
+                                            ? "text-gray-400 hover:text-white cursor-pointer"
+                                            : "text-gray-700 cursor-not-allowed"
                                     )}
                                 >
-                                    {day}
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
                                 </button>
-                            );
-                        })}
-                    </div>
+                                <span className="font-medium text-white">
+                                    {MONTHS[currentMonth]} {currentYear}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setViewDate(new Date(currentYear, currentMonth + 1, 1))}
+                                    className="p-1 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                    {/* Time Selection */}
-                    <div className="border-t border-white/10 pt-4 mt-4">
-                        <label className="block text-xs uppercase text-gray-500 font-bold mb-2 tracking-wider">Time</label>
-                        <div className="flex items-center gap-2">
-                            <select
-                                value={selectedTime.hours}
-                                onChange={(e) => handleTimeChange("hours", e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-white outline-none focus:border-primary-500 w-full cursor-pointer appearance-none text-center hover:bg-white/10 transition-colors"
-                            >
-                                {Array.from({ length: 24 }).map((_, i) => (
-                                    <option key={i} value={i} className="bg-slate-900 text-white">
-                                        {i.toString().padStart(2, "0")}
-                                    </option>
+                            {/* Calendar Grid */}
+                            <div className="grid grid-cols-7 gap-0 text-center text-sm">
+                                {DAYS.map(day => (
+                                    <div key={day} className="text-gray-500 py-2 text-xs font-medium w-9">{day}</div>
                                 ))}
-                            </select>
-                            <span className="text-gray-500 text-lg">:</span>
-                            <select
-                                value={selectedTime.minutes}
-                                onChange={(e) => handleTimeChange("minutes", e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-white outline-none focus:border-primary-500 w-full cursor-pointer appearance-none text-center hover:bg-white/10 transition-colors"
-                            >
-                                {Array.from({ length: 12 }).map((_, i) => (
-                                    <option key={i * 5} value={i * 5} className="bg-slate-900 text-white">
-                                        {(i * 5).toString().padStart(2, "0")}
-                                    </option>
+                                {Array.from({ length: firstDay }).map((_, i) => (
+                                    <div key={`empty-${i}`} className="w-9 h-9" />
                                 ))}
-                            </select>
+                                {Array.from({ length: daysInMonth }).map((_, i) => {
+                                    const day = i + 1;
+                                    const disabled = isDateDisabled(day);
+                                    const selected = isSelected(day);
+
+                                    return (
+                                        <button
+                                            key={day}
+                                            type="button"
+                                            disabled={disabled}
+                                            onClick={() => handleDateSelect(day)}
+                                            className={cn(
+                                                "w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm",
+                                                selected
+                                                    ? "bg-[#E50914] text-white"
+                                                    : disabled
+                                                        ? "text-gray-700 cursor-not-allowed"
+                                                        : "text-gray-300 hover:bg-white/10"
+                                            )}
+                                        >
+                                            {day}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Quick Select */}
-                    <div className="border-t border-white/10 pt-3 mt-3 flex justify-between gap-2">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const today = new Date();
-                                isDateDisabled(today.getDate()) || setSelectedDate(today);
-                                setIsOpen(false);
-                            }}
-                            className="text-xs text-primary-400 hover:text-primary-300 transition-colors"
-                        >
-                            Today
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setIsOpen(false)}
-                            className="text-xs text-gray-400 hover:text-white transition-colors"
-                        >
-                            Done
-                        </button>
                     </div>
                 </div>
             )}

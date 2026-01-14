@@ -88,7 +88,7 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="px-4 py-2 rounded-lg bg-primary-500/20 text-primary-400 hover:bg-primary-500/30 transition-colors text-sm font-medium"
+                className="px-4 py-2 rounded bg-[#E50914]/20 text-[#E50914] hover:bg-[#E50914]/30 transition-colors text-sm font-medium"
             >
                 + Nominate Movie
             </button>
@@ -96,7 +96,7 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
             {/* Modal */}
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+                    <div className="bg-[#1a1a1a] border border-white/10 rounded-xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
                         {/* Header */}
                         <div className="p-4 border-b border-white/10 flex justify-between items-center">
                             <h2 className="text-lg font-semibold text-white">
@@ -169,7 +169,7 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                     <button
                                         onClick={handleNominate}
                                         disabled={isNominating !== null}
-                                        className="flex-1 py-2 rounded-lg bg-primary-500 text-white hover:bg-primary-400 transition-colors text-sm font-medium disabled:opacity-50"
+                                        className="flex-1 py-2 rounded bg-[#E50914] text-white hover:bg-[#f40612] transition-colors text-sm font-medium disabled:opacity-50"
                                     >
                                         {isNominating ? "Nominating..." : "Nominate"}
                                     </button>
@@ -185,7 +185,7 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                         onChange={(e) => handleQueryChange(e.target.value)}
                                         placeholder="Search movies and TV shows..."
                                         autoFocus
-                                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-primary-500 outline-none"
+                                        className="w-full px-4 py-3 rounded bg-[#333] border border-white/10 text-white placeholder-gray-500 focus:border-white/30 outline-none"
                                     />
                                 </div>
 

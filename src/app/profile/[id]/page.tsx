@@ -33,7 +33,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     const isOwnProfile = session.user.id === profile.id;
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-[#141414] relative">
+            {/* Fixed background effects for entire page */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E50914]/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#E50914]/5 rounded-full blur-3xl" />
+            </div>
+
             {/* Navigation */}
             <nav className="glass-nav sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 py-4">
@@ -58,10 +64,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             {/* Profile Header with Glass Background */}
             <header className="relative py-16 px-6 overflow-hidden">
-                {/* Background effects */}
-                <div className="absolute inset-0 hero-glow opacity-50" />
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl" />
 
                 <div className="max-w-4xl mx-auto relative">
                     <div className="glass-strong rounded-3xl p-8 md:p-10">
@@ -79,7 +81,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                                 className="object-cover"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-primary-500/20 to-accent-500/20">
+                                            <div className="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-[#E50914]/20 to-[#b20710]/20">
                                                 👤
                                             </div>
                                         )}

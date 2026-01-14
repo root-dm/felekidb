@@ -34,9 +34,9 @@ export function FollowButton({ targetUserId, isFollowing: initialIsFollowing, is
         <button
             onClick={handleClick}
             disabled={isLoading}
-            className={`px-5 py-2 rounded-lg font-medium transition-all disabled:opacity-50 ${isFollowing
+            className={`px-5 py-2 rounded font-medium transition-all disabled:opacity-50 ${isFollowing
                 ? "bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400"
-                : "bg-primary-500 text-white hover:bg-primary-400"
+                : "bg-[#E50914] text-white hover:bg-[#f40612]"
                 }`}
         >
             {isLoading ? "..." : isFollowing ? (isMutual ? "👥 Mutual" : "Following") : "Follow"}

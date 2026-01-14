@@ -52,7 +52,7 @@ export function UserSearch({ className }: UserSearchProps) {
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
                     placeholder="Search users..."
-                    className="w-full px-4 py-2 pl-10 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-primary-500/50"
+                    className="w-full px-4 py-2 pl-10 rounded bg-[#333] border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-white/30"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                     🔍
@@ -66,7 +66,7 @@ export function UserSearch({ className }: UserSearchProps) {
 
             {/* Results dropdown */}
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-xl overflow-hidden z-50">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
                     {results.map((user) => (
                         <Link
                             key={user.id}
@@ -101,7 +101,7 @@ export function UserSearch({ className }: UserSearchProps) {
             )}
 
             {isOpen && query.length >= 2 && results.length === 0 && !isLoading && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-xl p-4 text-center text-gray-500 text-sm z-50">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-lg p-4 text-center text-gray-500 text-sm z-50">
                     No users found
                 </div>
             )}

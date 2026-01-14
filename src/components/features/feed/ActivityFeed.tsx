@@ -106,7 +106,7 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
                             <p className="text-gray-300 text-sm">
                                 <Link
                                     href={`/profile/${item.user.id}`}
-                                    className="font-medium text-white hover:text-primary-400 transition-colors"
+                                    className="font-medium text-white hover:text-[#E50914] transition-colors"
                                 >
                                     {item.user.name}
                                 </Link>{" "}

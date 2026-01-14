@@ -3,15 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #f8fafc;
-  --background: #0f0f1a;
-  --muted: #94a3b8;
-  --muted-foreground: #64748b;
+  --foreground: #ffffff;
+  --background: #141414;
+  --muted: #b3b3b3;
+  --muted-foreground: #808080;
   --border: rgba(255, 255, 255, 0.1);
-  --card: rgba(255, 255, 255, 0.05);
-  --primary: #a855f7;
-  --accent: #ec4899;
-  --glow: rgba(168, 85, 247, 0.4);
+  --card: #181818;
+  --card-hover: #232323;
+  --primary: #E50914;
+  --primary-hover: #f40612;
+  --accent: #E50914;
+  --surface: #1a1a1a;
 }
 
 * {
@@ -33,10 +35,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(236, 72, 153, 0.1), transparent);
-  background-attachment: fixed;
 }
 
 a {
@@ -45,73 +43,76 @@ a {
 }
 
 /* ============================================================================
-   GLASSMORPHISM COMPONENTS
+   NETFLIX-STYLE COMPONENTS
    ============================================================================ */
 
 @layer components {
 
-  /* Primary glass panel */
+  /* Solid card panel */
+  .card {
+    @apply bg-[#181818] border border-white/5 shadow-xl rounded-lg;
+  }
+
+  /* Glass effect - kept for compatibility but now more subtle */
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl;
-    background-image: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%);
+    @apply bg-[#181818]/95 backdrop-blur-sm border border-white/10 shadow-xl;
   }
 
-  /* Stronger glass effect */
+  /* Stronger panel */
   .glass-strong {
-    @apply bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl;
-    background-image: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.04) 100%);
+    @apply bg-[#1f1f1f] border border-white/10 shadow-2xl;
   }
 
-  /* Navigation glass */
+  /* Navigation bar - Netflix style */
   .glass-nav {
-    @apply backdrop-blur-xl border-b border-white/10;
-    background: rgba(15, 15, 26, 0.8);
+    @apply border-b border-white/5;
+    background: linear-gradient(to bottom, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.9) 100%);
   }
 
-  /* Card with glow on hover */
+  /* Card with Netflix hover effect */
   .glass-card {
-    @apply glass rounded-2xl transition-all duration-300;
+    @apply bg-[#181818] rounded-lg transition-all duration-300 border border-transparent;
   }
 
   .glass-card:hover {
-    @apply border-white/20;
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.15),
-      0 20px 40px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
+    @apply border-white/10;
+    transform: scale(1.05);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(229, 9, 20, 0.3);
+    z-index: 10;
   }
 
-  /* Button styles */
+  /* Primary button - Netflix Red */
   .btn-primary {
-    @apply px-5 py-2.5 rounded-xl font-medium transition-all duration-300;
-    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+    @apply px-6 py-3 rounded font-semibold transition-all duration-200 text-white;
+    background: #E50914;
   }
 
   .btn-primary:hover {
-    box-shadow: 0 6px 30px rgba(168, 85, 247, 0.5);
-    transform: translateY(-2px);
+    background: #f40612;
+    transform: scale(1.02);
   }
 
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  /* Secondary button */
   .btn-secondary {
-    @apply px-5 py-2.5 rounded-xl font-medium transition-all duration-300 glass border-white/10;
+    @apply px-6 py-3 rounded font-semibold transition-all duration-200 bg-white/10 text-white border border-white/20;
   }
 
   .btn-secondary:hover {
-    @apply bg-white/10 border-white/20;
+    @apply bg-white/20 border-white/30;
   }
 
-  /* Input styles */
+  /* Input styles - dark theme */
   .input-glass {
-    @apply px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white transition-all duration-300 focus:outline-none focus:border-primary-500/50 focus:bg-white/10;
-    backdrop-filter: blur(10px);
+    @apply px-4 py-3 rounded bg-[#333] border border-white/10 text-white transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20;
   }
 
   .input-glass::placeholder {
-    color: rgba(156, 163, 175, 0.8);
+    color: rgba(179, 179, 179, 0.7);
   }
 
   /* Date/time input styling */
@@ -134,25 +135,15 @@ a {
     padding: 0;
   }
 
-  /* Movie poster cards */
+  /* Movie poster cards - Netflix style */
   .poster-card {
-    @apply relative overflow-hidden rounded-xl transition-all duration-500;
-  }
-
-  .poster-card::before {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-500 z-10;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
-  }
-
-  .poster-card:hover::before {
-    @apply opacity-100;
+    @apply relative overflow-hidden rounded transition-all duration-300;
   }
 
   .poster-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(168, 85, 247, 0.2);
+    transform: scale(1.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    z-index: 10;
   }
 
   /* Hero section */
@@ -163,55 +154,48 @@ a {
   .hero-glow::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
-    filter: blur(60px);
-    z-index: -1;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(to top, var(--background), transparent);
+    z-index: 1;
   }
 
-  /* Stats card */
+  /* Stats card - Netflix style */
   .stats-card {
-    @apply glass rounded-xl p-6 text-center transition-all duration-300;
-    position: relative;
-    overflow: hidden;
+    @apply bg-[#181818] rounded-lg p-6 text-center transition-all duration-300 border border-white/5;
   }
 
-  .stats-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #a855f7, transparent);
-    transition: left 0.5s ease;
+  .stats-card:hover {
+    @apply bg-[#232323] border-white/10;
   }
 
-  .stats-card:hover::before {
-    left: 100%;
-  }
-
-  /* Avatar ring */
+  /* Avatar ring - red accent */
   .avatar-ring {
-    @apply rounded-full p-0.5 bg-gradient-to-r from-primary-500 to-accent-500;
+    @apply rounded-full p-0.5;
+    background: linear-gradient(135deg, #E50914 0%, #b20710 100%);
   }
 
-  /* Badge styles */
+  /* Badge styles - Netflix red */
   .badge-glow {
-    @apply px-3 py-1 rounded-full text-sm font-medium;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-    border: 1px solid rgba(168, 85, 247, 0.3);
-    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    @apply px-3 py-1 rounded text-sm font-medium bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/30;
   }
 
-  /* Divider with glow */
+  /* Divider */
   .divider-glow {
-    @apply h-px w-full;
-    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
+    @apply h-px w-full bg-white/10;
+  }
+
+  /* Netflix-style row */
+  .content-row {
+    @apply flex gap-2 overflow-x-auto pb-4 scrollbar-hide;
+    scroll-snap-type: x mandatory;
+  }
+
+  .content-row>* {
+    scroll-snap-align: start;
+    flex-shrink: 0;
   }
 }
 
@@ -221,27 +205,36 @@ a {
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-500 via-pink-500 to-accent-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent;
+  }
+
+  .text-netflix-red {
+    color: #E50914;
   }
 
   .text-glow {
-    text-shadow: 0 0 20px rgba(168, 85, 247, 0.5),
-      0 0 40px rgba(168, 85, 247, 0.3);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   }
 
   .border-glow {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.2),
-      inset 0 0 20px rgba(168, 85, 247, 0.05);
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.2);
   }
 
   .shadow-glow {
-    box-shadow: 0 4px 30px rgba(168, 85, 247, 0.2),
-      0 0 60px rgba(168, 85, 247, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   }
 
   .shadow-glow-strong {
-    box-shadow: 0 10px 50px rgba(168, 85, 247, 0.4),
-      0 0 80px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -252,7 +245,7 @@ a {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
 
   to {
@@ -269,7 +262,7 @@ a {
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
   }
 }
 
@@ -277,11 +270,11 @@ a {
 
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
   }
 
   50% {
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 40px rgba(229, 9, 20, 0.6);
   }
 }
 
@@ -296,7 +289,7 @@ a {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
 .animate-float {
@@ -308,7 +301,7 @@ a {
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -339,7 +332,7 @@ a {
    ============================================================================ */
 
 :focus-visible {
-  outline: 2px solid #a855f7;
+  outline: 2px solid #E50914;
   outline-offset: 2px;
 }
 
@@ -357,12 +350,12 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.5);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* ============================================================================
@@ -370,6 +363,6 @@ a {
    ============================================================================ */
 
 ::selection {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(229, 9, 20, 0.4);
   color: white;
 }

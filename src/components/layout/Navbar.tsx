@@ -22,19 +22,20 @@ export function Navbar({ user }: NavbarProps) {
     const isDashboard = pathname === "/dashboard";
 
     return (
-        <nav className="glass-nav sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+        <nav className="sticky top-0 z-50 bg-gradient-to-b from-[#141414] to-transparent">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
                 <div className="flex justify-between items-center gap-4">
-                    {/* Logo - Text hidden on small mobile */}
-                    <Link href="/dashboard" className="flex items-center gap-2 group flex-shrink-0">
-                        <Image
-                            src="/images/logo-white.png"
-                            alt="FelekiDB"
-                            width={140}
-                            height={40}
-                            className="h-10 w-auto object-contain"
-                            priority
-                        />
+                    {/* Logo */}
+                    <Link href="/dashboard" className="flex items-center flex-shrink-0">
+                        <div className="relative w-32 h-9">
+                            <Image
+                                src="/images/logo-white.png"
+                                alt="FelekiDB"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
                     </Link>
 
                     {/* Desktop Search & Actions */}
@@ -46,7 +47,7 @@ export function Navbar({ user }: NavbarProps) {
 
                         <Link
                             href="/dashboard/create"
-                            className="btn-primary flex items-center gap-2 px-3 py-2 text-sm whitespace-nowrap"
+                            className="bg-[#E50914] hover:bg-[#f40612] text-white font-semibold flex items-center gap-2 px-4 py-2 rounded text-sm whitespace-nowrap transition-colors"
                         >
                             <span>+</span>
                             <span className="hidden sm:inline">New Night</span>
@@ -54,18 +55,20 @@ export function Navbar({ user }: NavbarProps) {
 
                         {/* Profile & Mobile Toggle */}
                         <div className="flex items-center gap-3">
-                            <Link href={`/profile/${user.id}`} className="avatar-ring flex-shrink-0 relative">
-                                {user.image ? (
-                                    <Image
-                                        src={user.image}
-                                        alt={user.name || "Profile"}
-                                        width={36}
-                                        height={36}
-                                        className="rounded-full w-9 h-9 object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-sm">👤</div>
-                                )}
+                            <Link href={`/profile/${user.id}`} className="flex-shrink-0 relative">
+                                <div className="rounded-full p-0.5 bg-gradient-to-r from-[#E50914] to-[#b20710]">
+                                    {user.image ? (
+                                        <Image
+                                            src={user.image}
+                                            alt={user.name || "Profile"}
+                                            width={36}
+                                            height={36}
+                                            className="rounded-full w-9 h-9 object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-9 h-9 rounded-full bg-[#333] flex items-center justify-center text-sm">👤</div>
+                                    )}
+                                </div>
                             </Link>
 
                             {/* Mobile Hamburger */}
@@ -89,7 +92,7 @@ export function Navbar({ user }: NavbarProps) {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden mt-4 pt-4 border-t border-white/10 space-y-4 animate-fade-in-up">
+                    <div className="md:hidden mt-4 pt-4 border-t border-white/10 space-y-4">
                         <UserSearch className="w-full" />
                         <button
                             onClick={() => handleSignOut()}

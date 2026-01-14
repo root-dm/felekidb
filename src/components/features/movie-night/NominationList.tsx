@@ -99,7 +99,7 @@ export function NominationList({
                         className={`relative bg-white/5 border rounded-xl overflow-hidden transition-all ${isWinner
                             ? "border-yellow-500/50 ring-2 ring-yellow-500/20"
                             : isUserVote
-                                ? "border-primary-500/50"
+                                ? "border-[#E50914]/50"
                                 : "border-white/10 hover:border-white/20"
                             }`}
                     >
@@ -166,7 +166,7 @@ export function NominationList({
                                         👤
                                     </div>
                                 )}
-                                <span className="text-gray-500 text-sm hover:text-primary-400 transition-colors">
+                                <span className="text-gray-500 text-sm hover:text-[#E50914] transition-colors">
                                     {nomination.user.name}
                                 </span>
                             </Link>
@@ -177,7 +177,7 @@ export function NominationList({
                                     onClick={() => handleVote(nomination.id)}
                                     disabled={isVoting}
                                     className={`w-full py-2 rounded-lg font-medium text-sm transition-all ${isUserVote
-                                        ? "bg-primary-500 text-white"
+                                        ? "bg-[#E50914] text-white"
                                         : "bg-white/10 text-white hover:bg-white/20"
                                         }`}
                                 >

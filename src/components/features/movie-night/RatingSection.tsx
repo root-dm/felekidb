@@ -121,7 +121,7 @@ export function RatingSection({
                             <button
                                 type="submit"
                                 disabled={selectedScore === 0 || isSubmitting}
-                                className="w-full py-3 rounded-lg bg-primary-500 text-white font-medium hover:bg-primary-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-3 rounded bg-[#E50914] text-white font-medium hover:bg-[#f40612] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting
                                     ? "Submitting..."
@@ -174,17 +174,17 @@ export function RatingSection({
                                                 alt={rating.user.name || "User"}
                                                 width={32}
                                                 height={32}
-                                                className="rounded-full hover:ring-2 hover:ring-primary-500 transition-all"
+                                                className="rounded-full hover:ring-2 hover:ring-[#E50914] transition-all"
                                             />
                                         ) : (
-                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm hover:ring-2 hover:ring-primary-500 transition-all">
+                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm hover:ring-2 hover:ring-[#E50914] transition-all">
                                                 👤
                                             </div>
                                         )}
                                     </Link>
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <Link href={`/profile/${rating.user.id}`} className="text-white font-medium text-sm hover:text-primary-400 transition-colors">
+                                            <Link href={`/profile/${rating.user.id}`} className="text-white font-medium text-sm hover:text-[#E50914] transition-colors">
                                                 {rating.user.name}
                                             </Link>
                                             <span className="text-yellow-400 text-sm">

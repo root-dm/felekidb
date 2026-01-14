@@ -111,7 +111,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                         fill
                         className="object-cover opacity-20 blur-3xl scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/80 to-[#141414]/60" />
                 </div>
             )}
 
@@ -124,7 +124,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                 <div className="relative mb-12">
                     <div className="glass-strong rounded-3xl p-8 md:p-12 overflow-hidden relative">
                         {/* Background Decoration */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-[#E50914]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
                             {/* Winning Movie Poster or Placeholder */}
@@ -173,7 +173,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                     <div className="glass px-4 py-3 rounded-xl flex items-center gap-3">
                                         <span className="text-2xl">📅</span>
                                         <div>
-                                            <div className="text-xs text-primary-300 uppercase font-bold tracking-wider">Scheduled For</div>
+                                            <div className="text-xs text-[#E50914] uppercase font-bold tracking-wider">Scheduled For</div>
                                             <div className="text-white font-medium">{formatDate(new Date(movieNight.scheduledAt))}</div>
                                         </div>
                                     </div>
@@ -181,7 +181,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                         <div className="glass px-4 py-3 rounded-xl flex items-center gap-3">
                                             <span className="text-2xl">📍</span>
                                             <div>
-                                                <div className="text-xs text-primary-300 uppercase font-bold tracking-wider">Location</div>
+                                                <div className="text-xs text-[#E50914] uppercase font-bold tracking-wider">Location</div>
                                                 <div className="text-white font-medium">{movieNight.location}</div>
                                             </div>
                                         </div>
@@ -200,7 +200,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                                 <Link
                                                     key={inv.userId}
                                                     href={`/profile/${inv.userId}`}
-                                                    className="w-10 h-10 rounded-full border-2 border-slate-900 overflow-hidden hover:scale-110 hover:z-10 hover:border-primary-500 transition-all shadow-lg"
+                                                    className="w-10 h-10 rounded-full border-2 border-[#141414] overflow-hidden hover:scale-110 hover:z-10 hover:border-[#E50914] transition-all shadow-lg"
                                                     title={inv.user.name || "Attendee"}
                                                 >
                                                     {inv.user.image ? (
@@ -211,14 +211,14 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                                             height={40}
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full bg-slate-800 flex items-center justify-center text-xs">
+                                                        <div className="w-full h-full bg-[#232323] flex items-center justify-center text-xs">
                                                             👤
                                                         </div>
                                                     )}
                                                 </Link>
                                             ))}
                                             {movieNight.invitations.length > 8 && (
-                                                <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-xs font-bold text-white shadow-lg z-0">
+                                                <div className="w-10 h-10 rounded-full bg-[#232323] border-2 border-[#141414] flex items-center justify-center text-xs font-bold text-white shadow-lg z-0">
                                                     +{movieNight.invitations.length - 8}
                                                 </div>
                                             )}
@@ -236,7 +236,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Invite Link Tool */}
                         {isHost && movieNight.status === "PLANNING" && (
-                            <div className="glass p-6 rounded-2xl border-l-4 border-l-primary-500 animate-fade-in-up">
+                            <div className="glass p-6 rounded-2xl border-l-4 border-l-[#E50914] animate-fade-in-up">
                                 <label className="block text-sm font-bold text-white mb-2 flex items-center gap-2">
                                     🎟️ Invite Friends
                                     <span className="text-xs font-normal text-gray-400 bg-white/5 px-2 py-0.5 rounded-full">Share this code</span>
@@ -246,7 +246,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                         type="text"
                                         value={inviteLink}
                                         readOnly
-                                        className="flex-1 px-4 py-3 rounded-xl bg-slate-950/50 border border-white/10 text-white font-mono text-sm focus:outline-none"
+                                        className="flex-1 px-4 py-3 rounded bg-[#0a0a0a] border border-white/10 text-white font-mono text-sm focus:outline-none"
                                     />
                                     <CopyButton text={inviteLink} />
                                 </div>

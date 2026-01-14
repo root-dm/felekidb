@@ -36,7 +36,7 @@ export default async function DashboardPage() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
                         <div>
                             <h1 className="text-3xl font-bold text-white mb-2">
-                                Welcome back, <span className="text-gradient">{session.user.name?.split(" ")[0]}</span> 👋
+                                Welcome back, <span className="text-[#E50914]">{session.user.name?.split(" ")[0]}</span> 👋
                             </h1>
                             <p className="text-gray-400">
                                 Your movie night hub
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                                     <div className="text-2xl font-bold text-white">{stats.winningNominations}</div>
                                     <div className="text-gray-500 text-xs">Wins</div>
                                 </div>
-                                <Link href={`/profile/${session.user.id}`} className="stats-card hover:border-primary-500/50">
+                                <Link href={`/profile/${session.user.id}`} className="stats-card hover:border-[#E50914]/50">
                                     <div className="text-2xl font-bold text-white">{stats.followersCount}</div>
                                     <div className="text-gray-500 text-xs">Followers</div>
                                 </Link>
@@ -76,7 +76,7 @@ export default async function DashboardPage() {
                                         <span className="badge-glow">{upcoming.length}</span>
                                     )}
                                 </h2>
-                                <Link href="/dashboard/create" className="text-primary-400 text-sm hover:text-primary-300 transition-colors">
+                                <Link href="/dashboard/create" className="text-[#E50914] text-sm hover:text-[#f40612] transition-colors">
                                     + Create new
                                 </Link>
                             </div>
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                                                         className="object-cover"
                                                     />
                                                 ) : (
-                                                    <div className="absolute inset-0 flex items-center justify-center text-5xl bg-gradient-to-br from-primary-500/20 to-accent-500/20">
+                                                    <div className="absolute inset-0 flex items-center justify-center text-5xl bg-gradient-to-br from-[#E50914]/20 to-[#b20710]/20">
                                                         🎬
                                                     </div>
                                                 )}
