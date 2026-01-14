@@ -19,17 +19,9 @@ const createMovieNightSchema = z.object({
 
 export type CreateMovieNightInput = z.infer<typeof createMovieNightSchema>;
 
-/**
- * Create a new movie night
- */
-export async function createMovieNight(input: CreateMovieNightInput) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+import { createSafeAction } from "@/lib/server-utils";
 
-    const validated = createMovieNightSchema.parse(input);
-
+export const createMovieNight = createSafeAction(createMovieNightSchema, async (data, userId) => {
     // Generate unique invite code
     let inviteCode = generateInviteCode();
     let attempts = 0;
@@ -44,13 +36,13 @@ export async function createMovieNight(input: CreateMovieNightInput) {
 
     const movieNight = await prisma.movieNight.create({
         data: {
-            title: validated.title,
-            description: validated.description,
-            scheduledAt: validated.scheduledAt,
-            location: validated.location,
-            votingDeadline: validated.votingDeadline,
+            title: data.title,
+            description: data.description,
+            scheduledAt: data.scheduledAt,
+            location: data.location,
+            votingDeadline: data.votingDeadline,
             inviteCode,
-            hostId: session.user.id,
+            hostId: userId,
         },
     });
 
@@ -58,25 +50,24 @@ export async function createMovieNight(input: CreateMovieNightInput) {
     await prisma.invitation.create({
         data: {
             movieNightId: movieNight.id,
-            userId: session.user.id,
+            userId: userId,
             status: "ACCEPTED",
             joinedAt: new Date(),
         },
     });
 
     revalidatePath("/dashboard");
-    redirect(`/nights/${movieNight.id}`);
-}
+    return movieNight;
+});
 
 /**
  * Join a movie night via invite code
  */
-export async function joinMovieNight(inviteCode: string) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+const joinMovieNightSchema = z.object({
+    inviteCode: z.string(),
+});
 
+export const joinMovieNight = createSafeAction(joinMovieNightSchema, async ({ inviteCode }, userId) => {
     const movieNight = await prisma.movieNight.findUnique({
         where: { inviteCode },
         include: { invitations: true },
@@ -92,39 +83,36 @@ export async function joinMovieNight(inviteCode: string) {
 
     // Check if already joined
     const existingInvite = movieNight.invitations.find(
-        (inv) => inv.userId === session.user!.id
+        (inv) => inv.userId === userId
     );
 
     if (existingInvite) {
-        redirect(`/nights/${movieNight.id}`);
+        return movieNight;
     }
 
     // Create invitation
     await prisma.invitation.create({
         data: {
             movieNightId: movieNight.id,
-            userId: session.user.id,
+            userId: userId,
             status: "ACCEPTED",
             joinedAt: new Date(),
         },
     });
 
     revalidatePath(`/nights/${movieNight.id}`);
-    redirect(`/nights/${movieNight.id}`);
-}
+    return movieNight;
+});
 
 /**
  * Update movie night status
  */
-export async function updateMovieNightStatus(
-    nightId: string,
-    status: "PLANNING" | "VOTING" | "WATCHING" | "RATING" | "COMPLETED"
-) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+const updateStatusSchema = z.object({
+    nightId: z.string(),
+    status: z.enum(["PLANNING", "VOTING", "WATCHING", "RATING", "COMPLETED"]),
+});
 
+export const updateMovieNightStatus = createSafeAction(updateStatusSchema, async ({ nightId, status }, userId) => {
     const movieNight = await prisma.movieNight.findUnique({
         where: { id: nightId },
     });
@@ -133,7 +121,7 @@ export async function updateMovieNightStatus(
         throw new Error("Movie night not found");
     }
 
-    if (movieNight.hostId !== session.user.id) {
+    if (movieNight.hostId !== userId) {
         throw new Error("Only the host can change status");
     }
 
@@ -143,7 +131,8 @@ export async function updateMovieNightStatus(
     });
 
     revalidatePath(`/nights/${nightId}`);
-}
+    return { success: true };
+});
 
 /**
  * Get user's movie nights for dashboard
@@ -199,12 +188,12 @@ export async function getUserMovieNights() {
 /**
  * Host can manually set the winning movie (override voting)
  */
-export async function setWinningMovie(nightId: string, nominationId: string) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+const setWinnerSchema = z.object({
+    nightId: z.string(),
+    nominationId: z.string(),
+});
 
+export const setWinningMovie = createSafeAction(setWinnerSchema, async ({ nightId, nominationId }, userId) => {
     const movieNight = await prisma.movieNight.findUnique({
         where: { id: nightId },
         include: { nominations: true },
@@ -214,7 +203,7 @@ export async function setWinningMovie(nightId: string, nominationId: string) {
         throw new Error("Movie night not found");
     }
 
-    if (movieNight.hostId !== session.user.id) {
+    if (movieNight.hostId !== userId) {
         throw new Error("Only the host can set the winning movie");
     }
 
@@ -233,17 +222,17 @@ export async function setWinningMovie(nightId: string, nominationId: string) {
     });
 
     revalidatePath(`/nights/${nightId}`);
-}
+    return { success: true };
+});
 
 /**
  * Host can delete a movie night
  */
-export async function deleteMovieNight(nightId: string) {
-    const session = await auth();
-    if (!session?.user?.id) {
-        throw new Error("Unauthorized");
-    }
+const deleteNightSchema = z.object({
+    nightId: z.string(),
+});
 
+export const deleteMovieNight = createSafeAction(deleteNightSchema, async ({ nightId }, userId) => {
     const movieNight = await prisma.movieNight.findUnique({
         where: { id: nightId },
     });
@@ -252,7 +241,7 @@ export async function deleteMovieNight(nightId: string) {
         throw new Error("Movie night not found");
     }
 
-    if (movieNight.hostId !== session.user.id) {
+    if (movieNight.hostId !== userId) {
         throw new Error("Only the host can delete this movie night");
     }
 
@@ -265,5 +254,5 @@ export async function deleteMovieNight(nightId: string) {
     await prisma.movieNight.delete({ where: { id: nightId } });
 
     revalidatePath("/dashboard");
-    redirect("/dashboard");
-}
+    return { success: true };
+});

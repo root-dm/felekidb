@@ -19,14 +19,21 @@ export default function CreateMovieNightPage() {
         const formData = new FormData(e.currentTarget);
 
         try {
-            await createMovieNight({
+            const result = await createMovieNight({
                 title: formData.get("title") as string,
                 description: formData.get("description") as string || undefined,
                 scheduledAt: new Date(formData.get("scheduledAt") as string),
                 location: formData.get("location") as string || undefined,
             });
+
+            if (result.success && result.data) {
+                router.push(`/nights/${result.data.id}`);
+            } else {
+                setError(result.error || "Failed to create movie night");
+                setIsLoading(false); // Only stop loading on error, otherwise we are redirecting
+            }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to create movie night");
+            setError("Something went wrong");
             setIsLoading(false);
         }
     }

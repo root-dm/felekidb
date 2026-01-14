@@ -48,7 +48,10 @@ export function NominationList({
     async function handleSetWinner(nominationId: string) {
         setSettingWinner(nominationId);
         try {
-            await setWinningMovie(movieNightId, nominationId);
+            const result = await setWinningMovie({ nightId: movieNightId, nominationId });
+            if (!result.success) {
+                console.error("Set winner failed:", result.error);
+            }
         } catch (error) {
             console.error("Set winner failed:", error);
         } finally {

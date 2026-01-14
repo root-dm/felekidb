@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Added import
 import { updateMovieNightStatus, deleteMovieNight } from "@/lib/actions/movie-night";
 import { closeVoting } from "@/lib/actions/voting";
 import { finalizeMovieNight } from "@/lib/actions/rating";
@@ -11,16 +12,23 @@ interface MovieNightActionsProps {
 }
 
 export function MovieNightActions({ movieNight }: MovieNightActionsProps) {
+    const router = useRouter(); // Import useRouter from next/navigation
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    async function handleAction(action: () => Promise<void>) {
+    async function handleAction(action: () => Promise<any>) {
         setIsLoading(true);
         setError(null);
         try {
-            await action();
+            const result = await action();
+            // Check if result is from createSafeAction
+            if (result && typeof result === 'object' && 'success' in result) {
+                if (!result.success) {
+                    throw new Error(result.error || "Action failed");
+                }
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : "Action failed");
         } finally {
@@ -32,7 +40,12 @@ export function MovieNightActions({ movieNight }: MovieNightActionsProps) {
         setIsDeleting(true);
         setError(null);
         try {
-            await deleteMovieNight(movieNight.id);
+            const result = await deleteMovieNight({ nightId: movieNight.id });
+            if (result.success) {
+                router.push("/dashboard");
+            } else {
+                throw new Error(result.error || "Delete failed");
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : "Delete failed");
             setIsDeleting(false);
@@ -46,7 +59,7 @@ export function MovieNightActions({ movieNight }: MovieNightActionsProps) {
                 return {
                     label: "Start Voting",
                     icon: "🗳️",
-                    action: () => updateMovieNightStatus(movieNight.id, "VOTING"),
+                    action: () => updateMovieNightStatus({ nightId: movieNight.id, status: "VOTING" }),
                     btnClass: "bg-yellow-500 hover:bg-yellow-600 text-black",
                     description: "Lock nominations and let attendees vote",
                 };
@@ -54,7 +67,7 @@ export function MovieNightActions({ movieNight }: MovieNightActionsProps) {
                 return {
                     label: "Finalize Winner",
                     icon: "🏆",
-                    action: () => closeVoting(movieNight.id),
+                    action: () => closeVoting(movieNight.id), // Not refactored yet
                     btnClass: "bg-green-500 hover:bg-green-600 text-white",
                     description: "Pick the movie with most votes and start watching",
                 };
@@ -63,7 +76,7 @@ export function MovieNightActions({ movieNight }: MovieNightActionsProps) {
                 return {
                     label: "Complete Night",
                     icon: "✅",
-                    action: () => finalizeMovieNight(movieNight.id),
+                    action: () => finalizeMovieNight(movieNight.id), // Not refactored yet
                     btnClass: "btn-primary",
                     description: "Finalize ratings and update reputation scores",
                 };

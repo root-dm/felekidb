@@ -92,7 +92,16 @@ export default async function JoinPage({ params }: JoinPageProps) {
                         <form
                             action={async () => {
                                 "use server";
-                                await joinMovieNight(code);
+                                const result = await joinMovieNight({ inviteCode: code });
+                                if (result.success && result.data) {
+                                    redirect(`/nights/${result.data.id}`);
+                                } else {
+                                    // In a real app we might redirect to error or show toast, 
+                                    // but for now redirecting to dashboard or keeping here is fine.
+                                    // Since we can't easily show error in server action form without hooks,
+                                    // we might just refresh.
+                                    redirect(`/join/${code}?error=${encodeURIComponent(result.error || "Failed to join")}`);
+                                }
                             }}
                         >
                             <button
