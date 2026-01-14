@@ -25,10 +25,16 @@ export function createSafeAction<TInput, TOutput>(
             const validatedResult = schema.safeParse(input);
 
             if (!validatedResult.success) {
+                const fieldErrors = validatedResult.error.flatten().fieldErrors;
+                // Get the first error message from any field
+                const firstError = Object.values(fieldErrors)
+                    .filter((errors): errors is string[] => Array.isArray(errors))
+                    .flat()[0] || "Validation failed";
+
                 return {
                     success: false,
-                    error: "Validation failed",
-                    fieldErrors: validatedResult.error.flatten().fieldErrors,
+                    error: firstError,
+                    fieldErrors,
                 };
             }
 
@@ -69,10 +75,15 @@ export function createPublicSafeAction<TInput, TOutput>(
             const validatedResult = schema.safeParse(input);
 
             if (!validatedResult.success) {
+                const fieldErrors = validatedResult.error.flatten().fieldErrors;
+                const firstError = Object.values(fieldErrors)
+                    .filter((errors): errors is string[] => Array.isArray(errors))
+                    .flat()[0] || "Validation failed";
+
                 return {
                     success: false,
-                    error: "Validation failed",
-                    fieldErrors: validatedResult.error.flatten().fieldErrors,
+                    error: firstError,
+                    fieldErrors,
                 };
             }
 
