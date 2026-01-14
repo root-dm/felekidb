@@ -31,6 +31,7 @@ interface NominationListProps {
     userId: string;
     isHost?: boolean;
     movieNightId: string;
+    currentLeaderId?: string | null;
 }
 
 export function NominationList({
@@ -41,6 +42,7 @@ export function NominationList({
     userId,
     isHost = false,
     movieNightId,
+    currentLeaderId,
 }: NominationListProps) {
     const [votingId, setVotingId] = useState<string | null>(null);
     const [settingWinner, setSettingWinner] = useState<string | null>(null);
@@ -105,8 +107,13 @@ export function NominationList({
                     >
                         {/* Winner badge */}
                         {isWinner && (
-                            <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-yellow-500/90 text-black text-xs font-bold">
+                            <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-yellow-500/90 text-black text-xs font-bold shadow-lg">
                                 🏆 Winner
+                            </div>
+                        )}
+                        {!isWinner && currentLeaderId === nomination.id && (status === "PLANNING" || status === "VOTING") && (
+                            <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-[#E50914] text-white text-xs font-bold shadow-lg flex items-center gap-1 animate-pulse">
+                                🔥 Leading
                             </div>
                         )}
 
@@ -126,7 +133,7 @@ export function NominationList({
                             )}
 
                             {/* Vote count badge */}
-                            {(status === "VOTING" || status === "WATCHING" || status === "COMPLETED") && (
+                            {["PLANNING", "VOTING", "WATCHING", "COMPLETED"].includes(status) && (
                                 <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm text-white text-sm font-medium">
                                     {nomination.votes.length} votes
                                 </div>
@@ -172,7 +179,7 @@ export function NominationList({
                             </Link>
 
                             {/* Vote button */}
-                            {status === "VOTING" && (
+                            {(status === "PLANNING" || status === "VOTING") && (
                                 <button
                                     onClick={() => handleVote(nomination.id)}
                                     disabled={isVoting}

@@ -5,7 +5,6 @@ import { prisma } from "@/lib/db";
 import {
     calculateDampenedAverage,
     calculatePoints,
-    hasEnoughVoters,
 } from "@/lib/reputation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -49,8 +48,11 @@ export async function submitRating(input: SubmitRatingInput) {
         throw new Error("You must have attended to rate");
     }
 
-    if (movieNight.status !== "RATING" && movieNight.status !== "WATCHING") {
-        throw new Error("Rating is not open");
+    // Allow rating at any time as long as night exists and has a winner
+    // Effectively we allow it even in PLANNING/VOTING if a winner is selected?
+    // User wants "indefinite", so basically if winningNomination exists, we are good.
+    if (!movieNight.winningNomination) {
+        throw new Error("Cannot rate without a selected movie");
     }
 
     // Upsert rating
@@ -73,21 +75,53 @@ export async function submitRating(input: SubmitRatingInput) {
         },
     });
 
-    // Update status to RATING if still WATCHING
-    if (movieNight.status === "WATCHING") {
-        await prisma.movieNight.update({
-            where: { id: validated.movieNightId },
-            data: { status: "RATING" },
+    // Automatically update/create reputation event
+    // Fetch all current ratings
+    const allRatings = await prisma.rating.findMany({
+        where: { movieNightId: validated.movieNightId }
+    });
+
+    // Filter out nominator's rating
+    const nominatorId = movieNight.winningNomination.userId;
+    const eligibleRatings = allRatings.filter(r => r.userId !== nominatorId);
+
+    if (eligibleRatings.length > 0) {
+        const ratingScores = eligibleRatings.map((r) => r.score);
+        const averageRating = calculateDampenedAverage(ratingScores);
+        const points = calculatePoints(averageRating, eligibleRatings.length);
+
+        // Upsert reputation event
+        await prisma.reputationEvent.upsert({
+            where: {
+                movieNightId: validated.movieNightId
+            },
+            update: {
+                averageRating,
+                voterCount: eligibleRatings.length,
+                points,
+            },
+            create: {
+                userId: nominatorId,
+                movieNightId: validated.movieNightId,
+                nominationId: movieNight.winningNomination.id,
+                averageRating,
+                voterCount: eligibleRatings.length,
+                points,
+            }
         });
     }
 
     revalidatePath(`/nights/${validated.movieNightId}`);
+    revalidatePath("/dashboard");
 }
 
 /**
  * Finalize a movie night and create reputation event
+ * @deprecated functionality moved to submitRating and auto-updates
  */
 export async function finalizeMovieNight(movieNightId: string) {
+    // Keep this for backward compatibility or explicit closure if needed
+    // But update implementation to just set status to COMPLETED
     const session = await auth();
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
@@ -95,12 +129,6 @@ export async function finalizeMovieNight(movieNightId: string) {
 
     const movieNight = await prisma.movieNight.findUnique({
         where: { id: movieNightId },
-        include: {
-            ratings: true,
-            winningNomination: {
-                include: { user: true },
-            },
-        },
     });
 
     if (!movieNight) {
@@ -111,45 +139,12 @@ export async function finalizeMovieNight(movieNightId: string) {
         throw new Error("Only the host can finalize");
     }
 
-    if (movieNight.status !== "RATING") {
-        throw new Error("Movie night is not in rating phase");
-    }
-
-    if (!movieNight.winningNomination) {
-        throw new Error("No winning movie to rate");
-    }
-
-    // Filter out the nominator's own rating
-    const eligibleRatings = movieNight.ratings.filter(
-        (r) => r.userId !== movieNight.winningNomination!.userId
-    );
-
-    // Update status to completed
     await prisma.movieNight.update({
         where: { id: movieNightId },
         data: { status: "COMPLETED" },
     });
 
-    // Create reputation event if there are eligible ratings (excluding nominator's own)
-    if (eligibleRatings.length > 0) {
-        const ratingScores = eligibleRatings.map((r) => r.score);
-        const averageRating = calculateDampenedAverage(ratingScores);
-        const points = calculatePoints(averageRating, eligibleRatings.length);
-
-        await prisma.reputationEvent.create({
-            data: {
-                userId: movieNight.winningNomination.userId,
-                movieNightId,
-                nominationId: movieNight.winningNomination.id,
-                averageRating,
-                voterCount: eligibleRatings.length,
-                points,
-            },
-        });
-    }
-
     revalidatePath(`/nights/${movieNightId}`);
-    revalidatePath("/dashboard");
 }
 
 /**

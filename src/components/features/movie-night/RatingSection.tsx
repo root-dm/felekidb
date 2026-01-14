@@ -23,7 +23,6 @@ interface RatingSectionProps {
     ratings: Rating[];
     userRating: Rating | null | undefined;
     averageRating: number;
-    isHost: boolean;
 }
 
 export function RatingSection({
@@ -33,7 +32,6 @@ export function RatingSection({
     ratings,
     userRating,
     averageRating,
-    isHost,
 }: RatingSectionProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedScore, setSelectedScore] = useState(userRating?.score || 0);

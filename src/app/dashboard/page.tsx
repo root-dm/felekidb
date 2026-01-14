@@ -1,4 +1,4 @@
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -6,7 +6,6 @@ import { getUserMovieNights } from "@/lib/actions/movie-night";
 import { getActivityFeed, getQuickStats } from "@/lib/actions/feed";
 import { formatDate, getTimeRemaining } from "@/lib/utils";
 import { getPosterUrl } from "@/lib/tmdb";
-import { UserSearch } from "@/components/features/search/UserSearch";
 import { ActivityFeed } from "@/components/features/feed/ActivityFeed";
 
 import { Navbar } from "@/components/layout/Navbar";

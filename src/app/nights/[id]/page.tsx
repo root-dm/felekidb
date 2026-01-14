@@ -10,6 +10,8 @@ import { NominationList } from "@/components/features/movie-night/NominationList
 import { MovieSearch } from "@/components/features/movie-night/MovieSearch";
 import { RatingSection } from "@/components/features/movie-night/RatingSection";
 import { CopyButton } from "@/components/ui/CopyButton";
+import { EditableLocation } from "@/components/features/movie-night/EditableLocation";
+import { AutoStartManager } from "@/components/features/movie-night/AutoStartManager";
 
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -121,10 +123,17 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
             {/* Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
                 {/* Hero Section */}
-                <div className="relative mb-12">
+                <div className="relative mb-8"> {/* Reduced margin */}
                     <div className="glass-strong rounded-3xl p-8 md:p-12 overflow-hidden relative">
                         {/* Background Decoration */}
                         <div className="absolute top-0 right-0 w-96 h-96 bg-[#E50914]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+                        {/* Host Controls (Absolute Top Right) */}
+                        {isHost && (
+                            <div className="absolute top-6 right-6 z-20">
+                                <MovieNightActions movieNight={movieNight} />
+                            </div>
+                        )}
 
                         <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
                             {/* Winning Movie Poster or Placeholder */}
@@ -147,8 +156,8 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                             </div>
 
                             {/* Details */}
-                            <div className="flex-1 w-full">
-                                <div className="flex flex-wrap items-center gap-3 mb-4">
+                            <div className="flex-1 w-full text-center md:text-left">
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${statusColors[movieNight.status]}`}>
                                         {movieNight.status}
                                     </span>
@@ -164,66 +173,25 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                 </h1>
 
                                 {movieNight.description && (
-                                    <p className="text-lg text-gray-300 mb-6 max-w-2xl leading-relaxed">
+                                    <p className="text-lg text-gray-300 mb-6 max-w-2xl leading-relaxed mx-auto md:mx-0">
                                         {movieNight.description}
                                     </p>
                                 )}
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                                    <div className="glass px-4 py-3 rounded-xl flex items-center gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto md:mx-0">
+                                    <div className="glass px-4 py-3 rounded-xl flex items-center gap-3 text-left">
                                         <span className="text-2xl">📅</span>
                                         <div>
                                             <div className="text-xs text-[#E50914] uppercase font-bold tracking-wider">Scheduled For</div>
                                             <div className="text-white font-medium">{formatDate(new Date(movieNight.scheduledAt))}</div>
                                         </div>
                                     </div>
-                                    {movieNight.location && (
-                                        <div className="glass px-4 py-3 rounded-xl flex items-center gap-3">
-                                            <span className="text-2xl">📍</span>
-                                            <div>
-                                                <div className="text-xs text-[#E50914] uppercase font-bold tracking-wider">Location</div>
-                                                <div className="text-white font-medium">{movieNight.location}</div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
 
-                                {/* Attendees */}
-                                <div>
-                                    <div className="text-xs text-gray-500 uppercase font-bold mb-3 flex items-center gap-2">
-                                        <span>Attendees</span>
-                                        <span className="bg-white/10 text-white px-1.5 py-0.5 rounded text-[10px]">{movieNight.invitations.length}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex -space-x-3">
-                                            {movieNight.invitations.slice(0, 8).map((inv) => (
-                                                <Link
-                                                    key={inv.userId}
-                                                    href={`/profile/${inv.userId}`}
-                                                    className="w-10 h-10 rounded-full border-2 border-[#141414] overflow-hidden hover:scale-110 hover:z-10 hover:border-[#E50914] transition-all shadow-lg"
-                                                    title={inv.user.name || "Attendee"}
-                                                >
-                                                    {inv.user.image ? (
-                                                        <Image
-                                                            src={inv.user.image}
-                                                            alt={inv.user.name || "Attendee"}
-                                                            width={40}
-                                                            height={40}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-[#232323] flex items-center justify-center text-xs">
-                                                            👤
-                                                        </div>
-                                                    )}
-                                                </Link>
-                                            ))}
-                                            {movieNight.invitations.length > 8 && (
-                                                <div className="w-10 h-10 rounded-full bg-[#232323] border-2 border-[#141414] flex items-center justify-center text-xs font-bold text-white shadow-lg z-0">
-                                                    +{movieNight.invitations.length - 8}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <EditableLocation
+                                        nightId={movieNight.id}
+                                        initialLocation={movieNight.location}
+                                        isHost={isHost}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -250,6 +218,12 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                     />
                                     <CopyButton text={inviteLink} />
                                 </div>
+                                <AutoStartManager
+                                    nightId={movieNight.id}
+                                    scheduledAt={movieNight.scheduledAt}
+                                    status={movieNight.status}
+                                    isHost={isHost}
+                                />
                             </div>
                         )}
 
@@ -262,20 +236,30 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                     </h2>
                                     <p className="text-gray-400 text-sm mt-1">Suggest and vote for what to watch</p>
                                 </div>
-                                {movieNight.status === "PLANNING" && (
+                                {["PLANNING", "VOTING"].includes(movieNight.status) && (
                                     <MovieSearch movieNightId={movieNight.id} />
                                 )}
                             </div>
 
-                            <NominationList
-                                nominations={movieNight.nominations}
-                                status={movieNight.status}
-                                userVoteId={userVote?.id}
-                                winnerId={movieNight.winningNominationId}
-                                userId={session.user.id}
-                                isHost={isHost}
-                                movieNightId={movieNight.id}
-                            />
+                            {(() => {
+                                const leader = movieNight.nominations.length > 0
+                                    ? [...movieNight.nominations].sort((a, b) => b.votes.length - a.votes.length)[0]
+                                    : null;
+                                const currentLeaderId = leader && leader.votes.length > 0 ? leader.id : null;
+
+                                return (
+                                    <NominationList
+                                        nominations={movieNight.nominations}
+                                        status={movieNight.status}
+                                        userVoteId={userVote?.id}
+                                        winnerId={movieNight.winningNominationId}
+                                        userId={session.user.id}
+                                        isHost={isHost}
+                                        movieNightId={movieNight.id}
+                                        currentLeaderId={currentLeaderId}
+                                    />
+                                );
+                            })()}
                         </section>
 
                         {/* Ratings & Reviews */}
@@ -291,31 +275,61 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                         ratings={movieNight.ratings}
                                         userRating={userRating}
                                         averageRating={averageRating}
-                                        isHost={isHost}
                                     />
                                 </section>
                             )}
                     </div>
 
-                    {/* Right Column - Actions & Sidebar */}
-                    <div className="lg:col-span-1">
+                    {/* Right Column - Sidebar */}
+                    <div className="lg:col-span-1 space-y-6">
                         <div className="sticky top-24 space-y-6">
-                            {/* Host Controls */}
-                            {isHost && (
-                                <div className="glass-strong rounded-2xl p-6 animate-fade-in-up animate-delay-300">
-                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                        ⚡ Control Panel
+                            {/* Attendees List */}
+                            <div className="glass-strong rounded-2xl p-6 animate-fade-in-up animate-delay-300">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                        👥 Attendees
                                     </h3>
-                                    <MovieNightActions movieNight={movieNight} />
+                                    <span className="bg-white/10 text-white px-2 py-0.5 rounded-full text-xs">
+                                        {movieNight.invitations.length}
+                                    </span>
                                 </div>
-                            )}
 
-                            {/* Quick Tips or Info could go here */}
-                            <div className="glass rounded-xl p-5 border-l-2 border-l-blue-500/50">
-                                <h4 className="text-sm font-bold text-blue-300 mb-2">Did you know?</h4>
-                                <p className="text-sm text-gray-400">
-                                    You can click on any profile picture to see their movie stats and reputation!
-                                </p>
+                                {movieNight.invitations.length === 0 ? (
+                                    <p className="text-gray-500 text-sm italic">No one yet...</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {movieNight.invitations.map((inv) => (
+                                            <Link
+                                                key={inv.userId}
+                                                href={`/profile/${inv.userId}`}
+                                                className="flex items-center gap-3 group hover:bg-white/5 p-2 rounded-lg transition-colors"
+                                            >
+                                                <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden relative shadow-md">
+                                                    {inv.user.image ? (
+                                                        <Image
+                                                            src={inv.user.image}
+                                                            alt={inv.user.name || "Attendee"}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-[#232323] flex items-center justify-center text-sm">
+                                                            👤
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-white truncate group-hover:text-[#E50914] transition-colors">
+                                                        {inv.user.name || "Unknown User"}
+                                                    </p>
+                                                    {inv.userId === movieNight.hostId && (
+                                                        <span className="text-[10px] text-gray-400 uppercase tracking-widest">Host</span>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

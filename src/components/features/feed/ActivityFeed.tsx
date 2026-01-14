@@ -52,7 +52,13 @@ function getFeedMessage(item: FeedItem): React.ReactNode {
         case "follow":
             return (
                 <>
-                    started following <strong>{item.data.targetUser?.name}</strong>
+                    started following{" "}
+                    <Link
+                        href={`/profile/${item.data.targetUser?.id}`}
+                        className="font-medium text-white hover:text-[#E50914] transition-colors"
+                    >
+                        {item.data.targetUser?.name}
+                    </Link>
                 </>
             );
         default:

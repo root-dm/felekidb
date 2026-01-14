@@ -135,6 +135,40 @@ export const updateMovieNightStatus = createSafeAction(updateStatusSchema, async
 });
 
 /**
+ * Update movie night details (title, description, location, etc.)
+ */
+const updateDetailsSchema = z.object({
+    nightId: z.string(),
+    location: z.string().max(100).optional(),
+    description: z.string().max(500).optional(),
+});
+
+export const updateMovieNightDetails = createSafeAction(updateDetailsSchema, async ({ nightId, location, description }, userId) => {
+    const movieNight = await prisma.movieNight.findUnique({
+        where: { id: nightId },
+    });
+
+    if (!movieNight) {
+        throw new Error("Movie night not found");
+    }
+
+    if (movieNight.hostId !== userId) {
+        throw new Error("Only the host can update details");
+    }
+
+    await prisma.movieNight.update({
+        where: { id: nightId },
+        data: {
+            location: location !== undefined ? location : undefined,
+            description: description !== undefined ? description : undefined,
+        },
+    });
+
+    revalidatePath(`/nights/${nightId}`);
+    return { success: true };
+});
+
+/**
  * Get user's movie nights for dashboard
  */
 export async function getUserMovieNights() {

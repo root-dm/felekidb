@@ -33,7 +33,7 @@ export default function CreateMovieNightPage() {
                 setError(result.error || "Failed to create movie night");
                 setIsLoading(false);
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong");
             setIsLoading(false);
         }

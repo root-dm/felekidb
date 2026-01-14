@@ -89,7 +89,7 @@ export default async function HomePage() {
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-6">
-                        {features.map((feature, index) => (
+                        {features.map((feature) => (
                             <div
                                 key={feature.title}
                                 className="bg-[#181818] rounded-lg p-8 text-center hover:bg-[#232323] transition-all duration-300 border border-white/5 hover:border-white/10 group"
