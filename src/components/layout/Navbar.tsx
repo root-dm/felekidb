@@ -27,8 +27,14 @@ export function Navbar({ user }: NavbarProps) {
                 <div className="flex justify-between items-center gap-4">
                     {/* Logo - Text hidden on small mobile */}
                     <Link href="/dashboard" className="flex items-center gap-2 group flex-shrink-0">
-                        <span className="text-3xl animate-float">🎬</span>
-                        <span className="text-xl font-bold text-gradient hidden sm:block">FelekiDB</span>
+                        <Image
+                            src="/images/logo-white.png"
+                            alt="FelekiDB"
+                            width={140}
+                            height={40}
+                            className="h-10 w-auto object-contain"
+                            priority
+                        />
                     </Link>
 
                     {/* Desktop Search & Actions */}

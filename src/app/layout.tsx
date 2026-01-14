@@ -13,11 +13,17 @@ export const metadata: Metadata = {
     description: "Plan movie nights with friends. Vote on movies, watch together, and build your reputation as the best movie picker.",
     keywords: ["movie night", "watch party", "movie voting", "social movies", "film club"],
     authors: [{ name: "FelekiDB Team" }],
-    openGraph: {
-        title: "FelekiDB - Social Movie Night Planner",
-        description: "Plan movie nights with friends. Vote on movies, watch together, and build your reputation.",
-        type: "website",
+    icons: {
+        icon: [
+            { url: "/favicon.ico" },
+            { url: "/favicon.svg", type: "image/svg+xml" },
+            { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+        ],
+        apple: [
+            { url: "/apple-touch-icon.png", sizes: "180x180" },
+        ],
     },
+    manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

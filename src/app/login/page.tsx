@@ -1,6 +1,7 @@
 import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface LoginPageProps {
     searchParams: Promise<{ callbackUrl?: string }>;
@@ -29,8 +30,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     href="/"
                     className="flex items-center justify-center gap-2 mb-10"
                 >
-                    <span className="text-4xl">🎬</span>
-                    <span className="text-3xl font-bold text-white">FelekiDB</span>
+                    <div className="relative w-48 h-16">
+                        <Image
+                            src="/images/logo-white.png"
+                            alt="FelekiDB"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
+                    </div>
                 </Link>
 
                 {/* Login Card */}

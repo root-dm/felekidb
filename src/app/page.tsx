@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -15,8 +16,15 @@ export default async function HomePage() {
             <nav className="glass-nav fixed top-0 left-0 right-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="flex items-center gap-3">
-                        <span className="text-3xl animate-float">🎬</span>
-                        <span className="text-xl font-bold text-gradient">FelekiDB</span>
+                        <div className="relative w-40 h-12">
+                            <Image
+                                src="/images/logo-white.png"
+                                alt="FelekiDB"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
                     </Link>
                     <Link href="/login" className="btn-secondary">
                         Sign In
@@ -181,8 +189,14 @@ export default async function HomePage() {
             <footer className="py-12 border-t border-white/10">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-3">
-                        <span className="text-3xl">🎬</span>
-                        <span className="text-xl font-bold text-gradient">FelekiDB</span>
+                        <div className="relative w-32 h-10">
+                            <Image
+                                src="/images/logo-white.png"
+                                alt="FelekiDB"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
                     </div>
                     <div className="flex items-center gap-2 text-gray-400 text-sm">
                         <span>Powered by</span>

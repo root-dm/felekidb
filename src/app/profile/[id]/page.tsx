@@ -39,8 +39,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <div className="flex justify-between items-center">
                         <Link href="/dashboard" className="flex items-center gap-3">
-                            <span className="text-3xl animate-float">🎬</span>
-                            <span className="text-xl font-bold text-gradient">FelekiDB</span>
+                            <div className="relative w-36 h-10">
+                                <Image
+                                    src="/images/logo-white.png"
+                                    alt="FelekiDB"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
                         </Link>
                         <Link href="/dashboard" className="btn-secondary text-sm">
                             ← Dashboard

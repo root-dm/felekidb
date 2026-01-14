@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { joinMovieNight } from "@/lib/actions/movie-night";
 
 interface JoinPageProps {
@@ -51,8 +52,15 @@ export default async function JoinPage({ params }: JoinPageProps) {
             <div className="relative z-10 w-full max-w-md px-6">
                 {/* Logo */}
                 <Link href="/" className="flex items-center justify-center gap-2 mb-10">
-                    <span className="text-4xl">🎬</span>
-                    <span className="text-3xl font-bold text-white">FelekiDB</span>
+                    <div className="relative w-48 h-16">
+                        <Image
+                            src="/images/logo-white.png"
+                            alt="FelekiDB"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
+                    </div>
                 </Link>
 
                 {/* Join Card */}
