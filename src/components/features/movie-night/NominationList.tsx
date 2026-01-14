@@ -163,7 +163,7 @@ export function NominationList({
                             )}
 
                             {/* Nominator */}
-                            <Link href={`/profile/${nomination.user.id}`} className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity">
+                            <Link href={`/profile/${nomination.user.id}`} className="flex items-center gap-2 mb-3 active:opacity-80 md:hover:opacity-80 transition-opacity">
                                 {nomination.user.image ? (
                                     <Image
                                         src={nomination.user.image}
@@ -177,7 +177,7 @@ export function NominationList({
                                         👤
                                     </div>
                                 )}
-                                <span className="text-gray-500 text-sm hover:text-[#E50914] transition-colors">
+                                <span className="text-gray-500 text-sm active:text-[#E50914] md:hover:text-[#E50914] transition-colors">
                                     {nomination.user.name}
                                 </span>
                             </Link>

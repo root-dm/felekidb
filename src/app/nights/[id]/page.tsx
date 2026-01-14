@@ -354,7 +354,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                             <Link
                                                 key={inv.userId}
                                                 href={`/profile/${inv.userId}`}
-                                                className="flex items-center gap-3 group hover:bg-white/5 p-2 rounded-lg transition-colors"
+                                                className="flex items-center gap-3 group active:bg-white/5 md:hover:bg-white/5 p-2 rounded-lg transition-colors"
                                             >
                                                 <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden relative shadow-md">
                                                     {inv.user.image ? (
@@ -371,7 +371,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-white truncate group-hover:text-[#E50914] transition-colors">
+                                                    <p className="text-sm font-medium text-white truncate group-active:text-[#E50914] md:group-hover:text-[#E50914] transition-colors">
                                                         {inv.user.name || "Unknown User"}
                                                     </p>
                                                     {inv.userId === movieNight.hostId && (
