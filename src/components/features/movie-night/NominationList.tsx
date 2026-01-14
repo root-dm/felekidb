@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { getPosterUrl } from "@/lib/tmdb";
+import { getPosterUrl, WatchProvidersData } from "@/lib/tmdb";
 import { castVote } from "@/lib/actions/voting";
 import { setWinningMovie } from "@/lib/actions/movie-night";
 import { useState } from "react";
+import { StreamingBadges } from "./StreamingBadges";
 
 interface Nomination {
     id: string;
@@ -21,6 +22,7 @@ interface Nomination {
         image: string | null;
     };
     votes: { userId: string }[];
+    providers?: WatchProvidersData | null;
 }
 
 interface NominationListProps {
@@ -148,6 +150,10 @@ export function NominationList({
                                     {nomination.mediaType}
                                 </span>
                                 {nomination.releaseYear && <span>• {nomination.releaseYear}</span>}
+                            </div>
+
+                            <div className="mb-3">
+                                <StreamingBadges providers={nomination.providers || null} compact />
                             </div>
 
                             {nomination.pitch && (

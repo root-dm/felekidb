@@ -80,6 +80,12 @@ model User {
 
   // Notifications
   notifications Notification[]
+
+  // Watchlist
+  watchlist    WatchlistItem[]
+
+  // Reactions
+  reactions    Reaction[]
 }
 
 // ============================================================================
@@ -118,6 +124,7 @@ model MovieNight {
   description          String?
   scheduledAt          DateTime
   location             String?
+  theme                String?          // e.g. "Horror Night", "90s Action"
   inviteCode           String           @unique
   votingDeadline       DateTime?
   status               MovieNightStatus @default(PLANNING)
@@ -152,6 +159,8 @@ model MovieNightComment {
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   content      String     @db.Text
   createdAt    DateTime   @default(now())
+
+  reactions    Reaction[]
 
   @@index([movieNightId])
   @@index([userId])
@@ -279,4 +288,43 @@ model ReputationEvent {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+// ============================================================================
+// WATCHLIST
+// ============================================================================
+
+model WatchlistItem {
+  id          String   @id @default(cuid())
+  userId      String
+  tmdbId      Int
+  mediaType   String   // "movie" or "tv"
+  title       String
+  posterPath  String?
+  releaseYear Int?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId])
+  @@index([userId])
+}
+
+
+// ============================================================================
+// REACTIONS
+// ============================================================================
+
+model Reaction {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  emoji     String   // "👍", "❤️", "😂", etc.
+  createdAt DateTime @default(now())
+
+  comment   MovieNightComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+  @@index([commentId])
 }

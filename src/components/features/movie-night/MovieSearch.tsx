@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { nominateMovie } from "@/lib/actions/voting";
+import { WatchlistButton } from "@/components/ui/WatchlistButton";
 
 interface SearchResult {
     id: number;
@@ -215,28 +216,39 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                     ) : query.length >= 2 ? (
                                         <div className="space-y-2">
                                             {results.map((result) => (
-                                                <button
-                                                    key={result.id}
-                                                    onClick={() => setSelectedMovie(result)}
-                                                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-left"
-                                                >
-                                                    <Image
-                                                        src={result.posterUrl}
-                                                        alt={result.title}
-                                                        width={40}
-                                                        height={60}
-                                                        className="rounded"
-                                                    />
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="text-white font-medium truncate">
-                                                            {result.title}
-                                                        </h3>
-                                                        <p className="text-gray-500 text-sm">
-                                                            {result.mediaType.toUpperCase()}
-                                                            {result.releaseYear && ` • ${result.releaseYear}`}
-                                                        </p>
+                                                <div key={result.id} className="relative group">
+                                                    <button
+                                                        onClick={() => setSelectedMovie(result)}
+                                                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-left pr-12"
+                                                    >
+                                                        <Image
+                                                            src={result.posterUrl}
+                                                            alt={result.title}
+                                                            width={40}
+                                                            height={60}
+                                                            className="rounded"
+                                                        />
+                                                        <div className="flex-1 min-w-0">
+                                                            <h3 className="text-white font-medium truncate">
+                                                                {result.title}
+                                                            </h3>
+                                                            <p className="text-gray-500 text-sm">
+                                                                {result.mediaType.toUpperCase()}
+                                                                {result.releaseYear && ` • ${result.releaseYear}`}
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <WatchlistButton
+                                                            tmdbId={result.id}
+                                                            mediaType={result.mediaType}
+                                                            title={result.title}
+                                                            posterPath={result.posterUrl.includes("no-poster") ? null : result.posterUrl.replace("https://image.tmdb.org/t/p/w185", "")}
+                                                            releaseYear={result.releaseYear}
+                                                            className="p-1 hover:scale-110 transition-transform"
+                                                        />
                                                     </div>
-                                                </button>
+                                                </div>
                                             ))}
                                         </div>
                                     ) : (
@@ -252,25 +264,36 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                             ) : (
                                                 <div className="grid grid-cols-3 gap-2">
                                                     {trending.slice(0, 9).map((item) => (
-                                                        <button
-                                                            key={item.id}
-                                                            onClick={() => setSelectedMovie(item)}
-                                                            className="group relative aspect-[2/3] rounded-lg overflow-hidden hover:ring-2 hover:ring-[#E50914] transition-all"
-                                                        >
-                                                            <Image
-                                                                src={item.posterUrl}
-                                                                alt={item.title}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <div className="absolute bottom-0 left-0 right-0 p-2">
-                                                                    <p className="text-white text-xs font-medium line-clamp-2">
-                                                                        {item.title}
-                                                                    </p>
+                                                        <div key={item.id} className="relative group aspect-[2/3]">
+                                                            <button
+                                                                onClick={() => setSelectedMovie(item)}
+                                                                className="w-full h-full rounded-lg overflow-hidden hover:ring-2 hover:ring-[#E50914] transition-all relative"
+                                                            >
+                                                                <Image
+                                                                    src={item.posterUrl}
+                                                                    alt={item.title}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <div className="absolute bottom-0 left-0 right-0 p-2 text-left">
+                                                                        <p className="text-white text-xs font-medium line-clamp-2">
+                                                                            {item.title}
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
+                                                            </button>
+                                                            <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <WatchlistButton
+                                                                    tmdbId={item.id}
+                                                                    mediaType={item.mediaType}
+                                                                    title={item.title}
+                                                                    posterPath={item.posterUrl.includes("no-poster") ? null : item.posterUrl.replace("https://image.tmdb.org/t/p/w185", "")}
+                                                                    releaseYear={item.releaseYear}
+                                                                    className="bg-black/50 rounded-full p-1 hover:bg-black/70"
+                                                                />
                                                             </div>
-                                                        </button>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             )}

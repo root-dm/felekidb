@@ -25,6 +25,7 @@ export default function CreateMovieNightPage() {
                 description: formData.get("description") as string || undefined,
                 scheduledAt: new Date(formData.get("scheduledAt") as string),
                 location: formData.get("location") as string || undefined,
+                theme: formData.get("theme") as string || undefined,
             });
 
             if (result.success && result.data) {
@@ -143,6 +144,22 @@ export default function CreateMovieNightPage() {
                                 maxLength={500}
                                 placeholder="What's the theme? Any special instructions?"
                                 className="w-full px-4 py-3 rounded bg-[#333] border border-white/10 text-white focus:outline-none focus:border-white/30 transition-colors resize-none"
+                            />
+                        </div>
+
+                        {/* Theme */}
+                        <div>
+                            <label htmlFor="theme" className="block text-sm font-medium text-gray-300 mb-2">
+                                🎭 Theme
+                                <span className="text-gray-500 ml-1">(optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="theme"
+                                name="theme"
+                                maxLength={50}
+                                placeholder="Horror, 90s, So Bad It's Good"
+                                className="w-full px-4 py-3 rounded bg-[#333] border border-white/10 text-white focus:outline-none focus:border-white/30 transition-colors"
                             />
                         </div>
                     </div>

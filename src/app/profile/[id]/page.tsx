@@ -7,6 +7,10 @@ import { getFollowStatus, getFollowCounts } from "@/lib/actions/follow";
 import { formatDate } from "@/lib/utils";
 import { FollowButton } from "@/components/ui/FollowButton";
 import { FollowStats } from "@/components/features/profile/FollowStats";
+import { getUserWatchlist } from "@/lib/actions/watchlist";
+import { WatchlistGrid } from "@/components/features/profile/WatchlistGrid";
+import { getUserStats, calculateBadges } from "@/lib/stats";
+import { BadgeDisplay } from "@/components/features/profile/BadgeDisplay";
 
 interface ProfilePageProps {
     params: Promise<{ id: string }>;
@@ -20,11 +24,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         redirect("/login");
     }
 
-    const [profile, followStatus, followCounts] = await Promise.all([
+    const [profile, followStatus, followCounts, watchlist, userStats] = await Promise.all([
         getUserProfile(id),
         getFollowStatus(id),
         getFollowCounts(id),
+        getUserWatchlist(id),
+        getUserStats(id),
     ]);
+
+    const badges = calculateBadges(userStats);
 
     if (!profile) {
         notFound();
@@ -134,6 +142,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                     </span>
                                 </div>
 
+                                {/* Badges */}
+                                {badges.length > 0 && (
+                                    <div className="flex justify-center md:justify-start gap-3 mb-6">
+                                        {badges.map((badge) => (
+                                            <BadgeDisplay key={badge.id} badge={badge} />
+                                        ))}
+                                    </div>
+                                )}
+
                                 {/* Reputation Stats */}
                                 <div className="flex items-center justify-center md:justify-start gap-8">
                                     <div className="text-center">
@@ -173,7 +190,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="stats-card">
-                                <div className="text-3xl font-bold text-white">{profile.stats.nightsHosted}</div>
+                                <div className="text-3xl font-bold text-white">{userStats.hostingCount}</div>
                                 <div className="text-gray-500 text-xs mt-1">Nights Hosted</div>
                             </div>
                             <div className="stats-card">
@@ -181,12 +198,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                 <div className="text-gray-500 text-xs mt-1">Nights Attended</div>
                             </div>
                             <div className="stats-card">
-                                <div className="text-3xl font-bold text-white">{profile.reputation.totalNominations}</div>
+                                <div className="text-3xl font-bold text-white">{userStats.totalNominations}</div>
                                 <div className="text-gray-500 text-xs mt-1">Nominations</div>
                             </div>
                             <div className="stats-card">
-                                <div className="text-3xl font-bold text-white">{profile.stats.moviesWatched}</div>
-                                <div className="text-gray-500 text-xs mt-1">Movies Watched</div>
+                                <div className="text-3xl font-bold text-white">{userStats.totalVotesReceived}</div>
+                                <div className="text-gray-500 text-xs mt-1">Votes Recv</div>
                             </div>
                         </div>
                     </section>
@@ -205,7 +222,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </div>
                         ) : (
                             <div className="glass rounded-xl overflow-hidden divide-y divide-white/5">
-                                {profile.recentEvents.map((event) => (
+                                {profile.recentEvents.map((event: any) => (
                                     <div key={event.id} className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
                                         <div>
                                             <div className="text-white font-medium text-sm">{event.movieTitle}</div>
@@ -227,6 +244,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         )}
                     </section>
                 </div>
+
+                {/* Watchlist Section */}
+                <section className="mt-12 space-y-4">
+                    <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                        📺 Watchlist <span className="text-gray-500 text-sm font-normal">({watchlist.length})</span>
+                    </h2>
+                    <WatchlistGrid items={watchlist} isOwnProfile={isOwnProfile} />
+                </section>
             </main>
         </div>
     );

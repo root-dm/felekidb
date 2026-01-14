@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { addComment } from "@/lib/actions/comments";
 
+import { ReactionPicker } from "./ReactionPicker";
+
 interface Comment {
     id: string;
     content: string;
@@ -14,14 +16,19 @@ interface Comment {
         name: string | null;
         image: string | null;
     };
+    reactions: {
+        emoji: string;
+        userId: string;
+    }[];
 }
 
 interface CommentSectionProps {
     movieNightId: string;
     initialComments: Comment[];
+    currentUserId: string;
 }
 
-export function CommentSection({ movieNightId, initialComments }: CommentSectionProps) {
+export function CommentSection({ movieNightId, initialComments, currentUserId }: CommentSectionProps) {
     const [newComment, setNewComment] = useState("");
     const [isPending, startTransition] = useTransition();
     const [optimisticComments, addOptimisticComment] = useOptimistic(
@@ -37,7 +44,9 @@ export function CommentSection({ movieNightId, initialComments }: CommentSection
             id: `temp-${Date.now()}`,
             content: newComment,
             createdAt: new Date(),
+            createdAt: new Date(),
             user: { id: "", name: "You", image: null },
+            reactions: [], // Init empty reactions
         };
 
         setNewComment("");
@@ -133,6 +142,11 @@ export function CommentSection({ movieNightId, initialComments }: CommentSection
                                     </span>
                                 </div>
                                 <p className="text-gray-300 text-sm">{comment.content}</p>
+                                <ReactionPicker
+                                    commentId={comment.id}
+                                    reactions={comment.reactions}
+                                    currentUserId={currentUserId}
+                                />
                             </div>
                         </div>
                     ))

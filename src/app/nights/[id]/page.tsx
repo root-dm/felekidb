@@ -13,6 +13,8 @@ import { CopyButton } from "@/components/ui/CopyButton";
 import { EditableLocation } from "@/components/features/movie-night/EditableLocation";
 import { AutoStartManager } from "@/components/features/movie-night/AutoStartManager";
 import { CommentSection } from "@/components/features/movie-night/CommentSection";
+import { getWatchProviders, WatchProvidersData } from "@/lib/tmdb";
+import { StreamingBadges } from "@/components/features/movie-night/StreamingBadges";
 
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -66,6 +68,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                     user: {
                         select: { id: true, name: true, image: true },
                     },
+                    reactions: true,
                 },
                 orderBy: { createdAt: "desc" },
                 take: 50,
@@ -102,6 +105,23 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
 
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     const inviteLink = `${baseUrl}/join/${movieNight.inviteCode}`;
+
+    // Fetch watch providers for nominations
+    const nominationsWithProviders = await Promise.all(
+        movieNight.nominations.map(async (nom) => {
+            const providers = await getWatchProviders(nom.tmdbId, nom.mediaType as "movie" | "tv");
+            return { ...nom, providers };
+        })
+    );
+
+    // Fetch watch providers for winning movie
+    let winningProviders: WatchProvidersData | null = null;
+    if (movieNight.winningNomination) {
+        winningProviders = await getWatchProviders(
+            movieNight.winningNomination.tmdbId,
+            movieNight.winningNomination.mediaType as "movie" | "tv"
+        );
+    }
 
     // Status colors
     const statusColors = {
@@ -171,6 +191,11 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${statusColors[movieNight.status]}`}>
                                         {movieNight.status}
                                     </span>
+                                    {movieNight.theme && (
+                                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20 flex items-center gap-1">
+                                            🎭 {movieNight.theme}
+                                        </span>
+                                    )}
                                     {isHost && (
                                         <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/10 flex items-center gap-1">
                                             👑 Host
@@ -202,6 +227,12 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                         initialLocation={movieNight.location}
                                         isHost={isHost}
                                     />
+
+                                    {winningProviders && (
+                                        <div className="glass px-4 py-3 rounded-xl col-span-1 md:col-span-2">
+                                            <StreamingBadges providers={winningProviders} />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -252,14 +283,14 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                             </div>
 
                             {(() => {
-                                const leader = movieNight.nominations.length > 0
-                                    ? [...movieNight.nominations].sort((a, b) => b.votes.length - a.votes.length)[0]
+                                const leader = nominationsWithProviders.length > 0
+                                    ? [...nominationsWithProviders].sort((a, b) => b.votes.length - a.votes.length)[0]
                                     : null;
                                 const currentLeaderId = leader && leader.votes.length > 0 ? leader.id : null;
 
                                 return (
                                     <NominationList
-                                        nominations={movieNight.nominations}
+                                        nominations={nominationsWithProviders}
                                         status={movieNight.status}
                                         userVoteId={userVote?.id}
                                         winnerId={movieNight.winningNominationId}
@@ -293,6 +324,7 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                             <CommentSection
                                 movieNightId={movieNight.id}
                                 initialComments={movieNight.comments}
+                                currentUserId={session.user.id}
                             />
                         </section>
                     </div>

@@ -13,6 +13,7 @@ const createMovieNightSchema = z.object({
         message: "Date must be in the future",
     }),
     location: z.string().max(100).optional(),
+    theme: z.string().max(50).optional(),
     votingDeadline: z.coerce.date().optional(),
 });
 
@@ -39,9 +40,11 @@ export const createMovieNight = createSafeAction(createMovieNightSchema, async (
             description: data.description,
             scheduledAt: data.scheduledAt,
             location: data.location,
+            theme: data.theme,
             votingDeadline: data.votingDeadline,
             inviteCode,
             hostId: userId,
+            status: "PLANNING",
         },
     });
 

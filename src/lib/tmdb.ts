@@ -188,3 +188,53 @@ export function getReleaseYear(dateString: string | undefined): number | null {
     const year = parseInt(dateString.split("-")[0], 10);
     return isNaN(year) ? null : year;
 }
+
+export interface WatchProvider {
+    provider_id: number;
+    provider_name: string;
+    logo_path: string;
+    display_priority: number;
+}
+
+export interface WatchProvidersData {
+    link: string;
+    flatrate?: WatchProvider[];
+    rent?: WatchProvider[];
+    buy?: WatchProvider[];
+}
+
+/**
+ * Get watch providers for movie or TV show
+ */
+export async function getWatchProviders(
+    id: number,
+    mediaType: "movie" | "tv" = "movie"
+): Promise<WatchProvidersData | null> {
+    const cacheKey = `providers:${mediaType}:${id}`;
+    const cached = cache.get<WatchProvidersData>(cacheKey);
+
+    if (cached) {
+        return cached;
+    }
+
+    try {
+        const endpoint = `/${mediaType}/${id}/watch/providers`;
+        const data = await tmdbFetch<{ results: { [key: string]: WatchProvidersData } }>(
+            endpoint
+        );
+
+        // Get US providers by default for now
+        // In a real app, we might want to detect user locale
+        const usProviders = data.results["US"];
+
+        if (usProviders) {
+            cache.set(cacheKey, usProviders, 3600); // Cache for 1 hour
+            return usProviders;
+        }
+
+        return null;
+    } catch {
+        // Silently fail for providers, it's not critical
+        return null;
+    }
+}
