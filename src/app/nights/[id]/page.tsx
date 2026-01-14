@@ -253,7 +253,6 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                                         status={movieNight.status}
                                         userVoteId={userVote?.id}
                                         winnerId={movieNight.winningNominationId}
-                                        userId={session.user.id}
                                         isHost={isHost}
                                         movieNightId={movieNight.id}
                                         currentLeaderId={currentLeaderId}

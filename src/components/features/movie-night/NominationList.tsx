@@ -28,7 +28,6 @@ interface NominationListProps {
     status: string;
     userVoteId: string | undefined;
     winnerId: string | null;
-    userId: string;
     isHost?: boolean;
     movieNightId: string;
     currentLeaderId?: string | null;
@@ -39,7 +38,6 @@ export function NominationList({
     status,
     userVoteId,
     winnerId,
-    userId,
     isHost = false,
     movieNightId,
     currentLeaderId,

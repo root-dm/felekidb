@@ -5,8 +5,6 @@ import Image from "next/image";
 import { UserSearch } from "@/components/features/search/UserSearch";
 import { handleSignOut } from "@/lib/actions/auth";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
-
 interface NavbarProps {
     user: {
         id: string;
@@ -17,9 +15,6 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const pathname = usePathname();
-
-    const isDashboard = pathname === "/dashboard";
 
     return (
         <nav className="sticky top-0 z-50 bg-gradient-to-b from-[#141414] to-transparent">

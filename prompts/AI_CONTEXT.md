@@ -74,12 +74,20 @@ const validated = schema.parse(input);
 - Never expose API keys to client
 - Validate all inputs with Zod
 
+### 6. Visual & Design Rules
+
+- **Netflix Aesthetic**: Use dark backgrounds (#141414), red accents (#E50914), and solid cards.
+- **No Glassmorphism**: Avoid blurry/glass effects; use solid grays (#181818).
+- **Typography**: Bold, clean, cinematic.
+- **Micro-interactions**: Use hover scales and glows.
+
+
 ## Tech Stack Quick Reference
 
 | Layer | Technology |
 |-------|------------|
 | UI | React 18, Next.js 14 App Router |
-| Styling | TailwindCSS |
+| Styling | TailwindCSS (Netflix Design System: #E50914 Primary, #141414 Bg) |
 | Database | PostgreSQL + Prisma |
 | Auth | Auth.js (NextAuth) + Google OAuth |
 | Validation | Zod |

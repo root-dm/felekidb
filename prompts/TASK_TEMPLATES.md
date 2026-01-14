@@ -102,6 +102,7 @@ Guidelines:
 3. Follow accessibility best practices
 4. Include loading and error states
 5. Write component test
+6. Style: Use Netflix Palette (#E50914, #141414, #181818) - No glassmorphism!
 
 Location: src/components/[ui|features]/[ComponentName].tsx
 ```

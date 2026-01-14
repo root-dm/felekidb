@@ -54,7 +54,7 @@ Use this checklist when reviewing PRs or AI-generated code for FelekiDB.
 ## Styling
 
 - [ ] **Tailwind classes** - No inline styles
-- [ ] **Design tokens** - Using theme colors, not hardcoded
+- [ ] **Design tokens** - Using Netflix Red (#E50914) & Dark Theme
 - [ ] **Dark mode** - If supported, both modes work
 - [ ] **Spacing consistent** - Using spacing scale
 - [ ] **Overflow handled** - Long text truncated or wrapped
