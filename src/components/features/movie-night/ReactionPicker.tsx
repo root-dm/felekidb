@@ -92,16 +92,7 @@ export function ReactionPicker({ commentId, reactions = [], currentUserId }: Rea
     }, [pickerOpen]);
 
     // Close on click outside
-    useEffect(() => {
-        if (!pickerOpen) return;
-        const handleClickOutside = (e: MouseEvent) => {
-            // Simple check: if target is not inside our picker (which we don't have a ref for easily here, 
-            // but we can rely on the triggerRef check or just the backdrop)
-            // Actually we use a backdrop div for this so this effect might be redundant if we have the backdrop,
-            // but the backdrop is good practice.
-        };
-        // We implemented a backdrop div below so that handles it.
-    }, [pickerOpen]);
+
 
 
     const [mounted, setMounted] = useState(false);

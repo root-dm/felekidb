@@ -222,7 +222,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </div>
                         ) : (
                             <div className="glass rounded-xl overflow-hidden divide-y divide-white/5">
-                                {profile.recentEvents.map((event: any) => (
+                                {profile.recentEvents.map((event: { id: string; movieTitle: string; averageRating: number; points: number; createdAt: string | Date }) => (
                                     <div key={event.id} className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
                                         <div>
                                             <div className="text-white font-medium text-sm">{event.movieTitle}</div>

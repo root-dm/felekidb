@@ -44,7 +44,7 @@ export function CommentSection({ movieNightId, initialComments, currentUserId }:
             id: `temp-${Date.now()}`,
             content: newComment,
             createdAt: new Date(),
-            createdAt: new Date(),
+
             user: { id: "", name: "You", image: null },
             reactions: [], // Init empty reactions
         };

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { User, Nomination, Vote, MovieNight } from "@prisma/client";
+
 
 export interface UserStats {
     totalNights: number;
