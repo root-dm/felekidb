@@ -12,6 +12,7 @@ import { RatingSection } from "@/components/features/movie-night/RatingSection";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { EditableLocation } from "@/components/features/movie-night/EditableLocation";
 import { AutoStartManager } from "@/components/features/movie-night/AutoStartManager";
+import { LiveUpdates } from "@/components/features/movie-night/LiveUpdates";
 import { CommentSection } from "@/components/features/movie-night/CommentSection";
 import { getWatchProviders, WatchProvidersData } from "@/lib/tmdb";
 import { StreamingBadges } from "@/components/features/movie-night/StreamingBadges";
@@ -146,6 +147,8 @@ export default async function MovieNightPage({ params }: MovieNightPageProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/80 to-[#141414]/60" />
                 </div>
             )}
+
+            <LiveUpdates />
 
             {/* Navigation */}
             <Navbar user={session.user} />

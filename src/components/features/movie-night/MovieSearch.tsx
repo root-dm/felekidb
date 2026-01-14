@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { nominateMovie } from "@/lib/actions/voting";
 import { WatchlistButton } from "@/components/ui/WatchlistButton";
@@ -29,6 +30,12 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
     const [pitch, setPitch] = useState("");
     const [selectedMovie, setSelectedMovie] = useState<SearchResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Fetch trending when modal opens
     useEffect(() => {
@@ -109,9 +116,9 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
             </button>
 
             {/* Modal */}
-            {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+            {isOpen && mounted && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[#1a1a1a] border border-white/10 rounded-xl w-full max-w-2xl h-full md:h-auto md:max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="p-4 border-b border-white/10 flex justify-between items-center">
                             <h2 className="text-lg font-semibold text-white">
@@ -200,11 +207,11 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                         onChange={(e) => handleQueryChange(e.target.value)}
                                         placeholder="Search movies and TV shows..."
                                         autoFocus
-                                        className="w-full px-4 py-3 rounded bg-[#333] border border-white/10 text-white placeholder-gray-500 focus:border-white/30 outline-none"
+                                        className="w-full px-4 py-3 rounded bg-[#333] border border-white/10 text-white placeholder-gray-500 focus:border-white/30 outline-none ring-0 focus:ring-0"
                                     />
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto p-2">
+                                <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                                     {isSearching ? (
                                         <div className="p-8 text-center text-gray-400">
                                             Searching...
@@ -262,7 +269,7 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                                                     Loading trending...
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-3 gap-2">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 pb-4">
                                                     {trending.slice(0, 9).map((item) => (
                                                         <div key={item.id} className="relative group aspect-[2/3]">
                                                             <button
@@ -303,7 +310,8 @@ export function MovieSearch({ movieNightId }: MovieSearchProps) {
                             </>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

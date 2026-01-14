@@ -81,7 +81,7 @@ export function NotificationBell() {
                     />
 
                     {/* Panel */}
-                    <div className="absolute right-0 top-full mt-2 w-80 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="fixed left-4 right-4 top-16 md:absolute md:left-auto md:right-0 md:top-full md:mt-2 md:w-80 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="p-3 border-b border-white/10 flex items-center justify-between">
                             <h3 className="text-white font-semibold">Notifications</h3>
