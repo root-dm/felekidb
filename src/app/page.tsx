@@ -47,7 +47,7 @@ export default async function HomePage() {
                 {/* Hero Content */}
                 <div className="relative z-20 flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 max-w-4xl leading-tight">
-                        Movie Nights,<br />
+                        Movie Nights<br />
                         <span className="text-[#E50914]">Democratized</span>
                     </h1>
                     <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl">
