@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513" viewBox="0 0 342 513" fill="none">
+  <rect width="342" height="513" rx="8" fill="#1a1a2e"/>
+  <circle cx="171" cy="200" r="60" fill="#4a4a5a"/>
+  <text x="171" y="300" text-anchor="middle" fill="#6a6a7a" font-family="system-ui" font-size="24">No Poster</text>
+  <text x="171" y="330" text-anchor="middle" fill="#5a5a6a" font-family="system-ui" font-size="14">Available</text>
+</svg>

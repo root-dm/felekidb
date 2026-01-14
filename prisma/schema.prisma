@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// AUTH MODELS (Auth.js / NextAuth)
+// ============================================================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================================
+// USER MODEL
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Auth relations
+  accounts Account[]
+  sessions Session[]
+
+  // App relations
+  hostedNights     MovieNight[]      @relation("HostedNights")
+  invitations      Invitation[]
+  nominations      Nomination[]
+  votes            Vote[]
+  ratings          Rating[]
+  reputationEvents ReputationEvent[]
+
+  // Follow relations
+  followers Follow[] @relation("Following") // People who follow this user
+  following Follow[] @relation("Followers") // People this user follows
+}
+
+// ============================================================================
+// FOLLOW SYSTEM
+// ============================================================================
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // The user who is following
+  followingId String   // The user being followed
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ============================================================================
+// MOVIE NIGHT MODELS
+// ============================================================================
+
+enum MovieNightStatus {
+  PLANNING  // Invites going out, no voting yet
+  VOTING    // Nominations locked, voting open
+  WATCHING  // Winner selected, event in progress
+  RATING    // Movie watched, collecting ratings
+  COMPLETED // Ratings finalized
+}
+
+model MovieNight {
+  id                   String           @id @default(cuid())
+  title                String
+  description          String?
+  scheduledAt          DateTime
+  location             String?
+  inviteCode           String           @unique
+  votingDeadline       DateTime?
+  status               MovieNightStatus @default(PLANNING)
+  hostId               String
+  winningNominationId  String?          @unique
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  // Relations
+  host              User              @relation("HostedNights", fields: [hostId], references: [id], onDelete: Cascade)
+  winningNomination Nomination?       @relation("WinningNomination", fields: [winningNominationId], references: [id])
+  invitations       Invitation[]
+  nominations       Nomination[]      @relation("NightNominations")
+  ratings           Rating[]
+  reputationEvent   ReputationEvent?
+
+  @@index([hostId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Invitation {
+  id           String           @id @default(cuid())
+  movieNightId String
+  userId       String
+  status       InvitationStatus @default(PENDING)
+  joinedAt     DateTime?
+  createdAt    DateTime         @default(now())
+
+  movieNight MovieNight @relation(fields: [movieNightId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieNightId, userId])
+  @@index([userId])
+}
+
+// ============================================================================
+// NOMINATION & VOTING MODELS
+// ============================================================================
+
+enum MediaType {
+  movie
+  tv
+}
+
+model Nomination {
+  id           String    @id @default(cuid())
+  movieNightId String
+  userId       String
+  tmdbId       Int
+  mediaType    MediaType
+  title        String
+  posterPath   String?
+  releaseYear  Int?
+  pitch        String?
+  createdAt    DateTime  @default(now())
+
+  // Relations
+  movieNight          MovieNight       @relation("NightNominations", fields: [movieNightId], references: [id], onDelete: Cascade)
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes               Vote[]
+  wonMovieNight       MovieNight?      @relation("WinningNomination")
+  reputationEvent     ReputationEvent?
+
+  @@unique([movieNightId, tmdbId])
+  @@index([movieNightId])
+}
+
+model Vote {
+  id           String   @id @default(cuid())
+  nominationId String
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  nomination Nomination @relation(fields: [nominationId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([nominationId, id]) // One vote per user per movie night is enforced at application level
+  @@index([nominationId])
+  @@index([userId])
+}
+
+// ============================================================================
+// RATING & REPUTATION MODELS
+// ============================================================================
+
+model Rating {
+  id           String   @id @default(cuid())
+  movieNightId String
+  userId       String
+  score        Float    // 1.0 - 5.0
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  movieNight MovieNight @relation(fields: [movieNightId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieNightId, userId])
+  @@index([movieNightId])
+}
+
+model ReputationEvent {
+  id            String   @id @default(cuid())
+  userId        String
+  movieNightId  String   @unique
+  nominationId  String   @unique
+  averageRating Float
+  voterCount    Int
+  points        Float    // Pre-calculated impact on reputation
+  createdAt     DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movieNight MovieNight @relation(fields: [movieNightId], references: [id], onDelete: Cascade)
+  nomination Nomination @relation(fields: [nominationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
