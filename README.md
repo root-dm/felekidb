@@ -25,7 +25,7 @@ FelekiDB helps groups organize movie nights with built-in voting, scheduling, an
 
 ```bash
 # Clone and install
-git clone <repo-url>
+git clone https://github.com/root-dm/felekidb
 cd felekidb
 npm install
 
